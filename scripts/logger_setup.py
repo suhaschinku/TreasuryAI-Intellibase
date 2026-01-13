@@ -2,7 +2,6 @@ import logging
 import os
 from datetime import datetime, date
 from contextlib import contextmanager
-from functools import lru_cache
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 
@@ -72,9 +71,8 @@ def get_logger() -> logging.Logger:
     """
     return logger
 
-@lru_cache(maxsize=128)
 def read_template(filepath: str) -> str:
-    """Cached template file reading"""
+    """Template file reading"""
     try:
         with open(filepath, 'r', encoding='utf-8') as file:
             return file.read()

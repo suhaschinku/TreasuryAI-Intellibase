@@ -74,15 +74,8 @@ logger.info(f"Logs directory set: {logs_dir}")
 os.makedirs(logs_dir, exist_ok=True)
 logger.info(f"Ensured directory exists: {logs_dir}")
 
-# Configure logging with rotation
-log_file_path = os.path.join(logs_dir, "TreasuryAnalysis.log")
-logger = logging.getLogger('TreasuryAnalysis')
-logger.setLevel(logging.INFO)
-handler = RotatingFileHandler(log_file_path, maxBytes=50 * 1024 * 1024, backupCount=5)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.info("Logging configured with rotation")
+# Note: Logging is already configured in logger_setup.py
+logger.info("Using logger from logger_setup module")
 
 # Rate limiter
 limiter = Limiter(app=app, key_func=get_remote_address)

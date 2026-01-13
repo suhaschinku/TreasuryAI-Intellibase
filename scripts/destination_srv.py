@@ -3,9 +3,45 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
+import threading
+from datetime import datetime, timedelta
 
 # Set up logger
 logger = get_logger()
+
+# Token cache for OAuth tokens
+class TokenCache:
+    """Cache for OAuth tokens to avoid regenerating on every request"""
+    def __init__(self):
+        self._token = None
+        self._expiry = None
+        self._lock = threading.Lock()
+    
+    def get_token(self, uri, client_id, client_secret):
+        """Get cached token or generate new one if expired"""
+        with self._lock:
+            # Return cached token if valid
+            if self._token and self._expiry and datetime.now() < self._expiry:
+                logger.info("Using cached OAuth token")
+                return self._token
+            
+            # Generate new token
+            logger.info("Generating new OAuth token")
+            response = requests.post(uri, data={'grant_type': 'client_credentials'}, 
+                                    auth=(client_id, client_secret))
+            response.raise_for_status()
+            token_data = response.json()
+            
+            self._token = token_data['access_token']
+            # Cache for 80% of token lifetime (default 3600s = 1 hour)
+            expires_in = token_data.get('expires_in', 3600)
+            self._expiry = datetime.now() + timedelta(seconds=expires_in * 0.8)
+            
+            logger.info(f"OAuth token cached until {self._expiry}")
+            return self._token
+
+# Global token cache instance
+_token_cache = TokenCache()
 
 # Step 1: Load environment variables from CF VCAP_SERVICES
 def get_destination_service_credentials(vcap_services):
@@ -29,13 +65,10 @@ def get_destination_service_credentials(vcap_services):
         logger.info("VCAP_SERVICES not found in environment")
         return None
 
-# Step 2: Generate Token for Destination Services
+# Step 2: Generate Token for Destination Services (with caching)
 def generate_token(uri, client_id, client_secret):
-    response = requests.post(uri, data={'grant_type': 'client_credentials'}, auth=(client_id, client_secret))
-    response.raise_for_status()
-    logger.info("OAuth token generated successfully.")
-    # logger.info(f"Token: {response.json()['access_token']}")
-    return response.json()['access_token']
+    """Generate OAuth token using cache to avoid unnecessary requests"""
+    return _token_cache.get_token(uri, client_id, client_secret)
 
 # Step 3: Get Hana DataBase Details by passing Service Name
 def fetch_destination_details(uri, name, token):

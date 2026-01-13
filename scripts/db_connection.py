@@ -70,15 +70,36 @@ class ConnectionPool:
         self.lock = threading.Lock()
         self.cleanup_scheduler_started = False
 
+    def _is_connection_alive(self, conn):
+        """Check if a database connection is still alive"""
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1 FROM DUMMY")
+            cursor.close()
+            return True
+        except Exception as e:
+            logger.warning(f"Connection health check failed: {str(e)}")
+            return False
+    
     def get_connection(self):
         """Fetch a connection from the pool or create a new one if necessary."""
         with self.lock:
-            if self.pool:
-                logger.debug("Reusing connection from pool")
-                return self.pool.pop()
-            else:
-                logger.debug("Creating a new connection")
-                return self._create_connection()
+            # Check existing connections in pool for health
+            while self.pool:
+                conn = self.pool.pop()
+                if self._is_connection_alive(conn):
+                    logger.debug("Reusing healthy connection from pool")
+                    return conn
+                else:
+                    logger.warning("Discarding dead connection from pool")
+                    try:
+                        conn.close()
+                    except:
+                        pass
+            
+            # No healthy connection available, create new one
+            logger.debug("Creating a new connection")
+            return self._create_connection()
 
     def release_connection(self, conn):
         """Release a connection back to the pool."""

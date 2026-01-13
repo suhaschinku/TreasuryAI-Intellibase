@@ -28,33 +28,27 @@ logging.basicConfig(
 # Load environment variables
 load_dotenv()
 
-# Initialize AIC Credentials
+# Initialize AIC Credentials using CredentialsManager
 logger = logging.getLogger(__name__)
 logger.info("====> llm_client_intellibase.py -> GET AIC CREDENTIALS <====")
-vcap_services = os.environ.get("VCAP_SERVICES")
-destination_service_credentials = get_destination_service_credentials(vcap_services)
-logger.info(f"Destination Service Credentials: {destination_service_credentials}")
 
-try:
-    oauth_token = generate_token(
-        uri=destination_service_credentials['dest_auth_url'] + "/oauth/token",
-        client_id=destination_service_credentials['clientid'],
-        client_secret=destination_service_credentials['clientsecret']
-    )
-    logger.info("OAuth token generated successfully for destination service.")
-except Exception as e:
-    logger.error(f"Error generating OAuth token: {str(e)}")
-    raise
+# Import CredentialsManager using parent module reference
+import sys
+import os
+# Add parent directory to path only if running as script (not when imported as module)
+if __name__ == "__main__" or 'scripts' not in sys.path[0]:
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
 
-AIC_CREDENTIALS = None
-dest_AIC = "GENAI_AI_CORE"
-aicore_details = fetch_destination_details(
-    destination_service_credentials['dest_base_url'],
-    dest_AIC,
-    oauth_token
-)
-AIC_CREDENTIALS = extract_aicore_credentials(aicore_details)
-logger.info(f"AIC Credentials: {AIC_CREDENTIALS}")
+from credentials_manager import credentials_manager
+
+# Initialize credentials if not already done
+credentials_manager.initialize()
+
+# Get AIC credentials from singleton
+AIC_CREDENTIALS = credentials_manager.get_aic_credentials()
+logger.info(f"AIC Credentials loaded from CredentialsManager: {AIC_CREDENTIALS}")
 
 # Initialize Orchestration Service
 
@@ -239,4 +233,4 @@ def print_token_summary(result: dict) -> None:
 
 def execute_aika_analysis_Intellibase(coda_prompt):
     """Execute aika analysis."""
-    return run_orchestration(coda_prompt, error_context="aika analysis")  
+    return run_orchestration(coda_prompt, error_context="aika analysis")

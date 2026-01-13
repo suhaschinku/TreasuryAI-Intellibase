@@ -15,32 +15,25 @@ from destination_srv import get_destination_service_credentials, generate_token,
 DataFrameType = pd.DataFrame
 
 
-# Initialize HANA Credentials
-logger.info("====> DANS_Upload.py -> GET HANA CREDENTIALS <====")
-vcap_services = os.environ.get("VCAP_SERVICES")
-destination_service_credentials = get_destination_service_credentials(vcap_services)
-logger.info(f"Destination Service Credentials: {destination_service_credentials}")
+# Initialize HANA Credentials using CredentialsManager
+logger.info("====> Data_Dictionary.py -> GET HANA CREDENTIALS <====")
 
-try:
-    oauth_token = generate_token(
-        uri=destination_service_credentials['dest_auth_url'] + "/oauth/token",
-        client_id=destination_service_credentials['clientid'],
-        client_secret=destination_service_credentials['clientsecret']
-    )
-    logger.info("OAuth token generated successfully for destination service.")
-except Exception as e:
-    logger.error(f"Error generating OAuth token: {str(e)}")
-    raise
+# Import CredentialsManager using parent module reference
+import sys
+# Add parent directory to path only if running as script (not when imported as module)
+if __name__ == "__main__" or 'scripts' not in sys.path[0]:
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
 
-HANA_CREDENTIALS = None
-dest_HDB = "GENAI_HDB"
-hana_dest_details = fetch_destination_details(
-    destination_service_credentials['dest_base_url'],
-    dest_HDB,
-    oauth_token
-)
-HANA_CREDENTIALS = extract_hana_credentials(hana_dest_details)
-logger.info(f"HANA Credentials: {HANA_CREDENTIALS}")
+from credentials_manager import credentials_manager
+
+# Initialize credentials if not already done
+credentials_manager.initialize()
+
+# Get HANA credentials from singleton
+HANA_CREDENTIALS = credentials_manager.get_hana_credentials()
+logger.info(f"HANA Credentials loaded from CredentialsManager: {HANA_CREDENTIALS}")
 
 
 class DictionaryUpdater:
