@@ -1,0 +1,1428 @@
+# ==============================================
+# COMPLETE ENHANCED CODA ONTOLOGY WITH IMPROVED USER INPUT ANALYSIS
+# AND ENHANCED MONTHLY GROUPING SUPPORT
+# ==============================================
+
+@prefix coda: <http://example.org/coda#> .
+@prefix finsight: <http://example.org/finsight#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+@prefix : <http://example.org/ontology#> .
+@prefix coda: <http://example.org/coda#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+@prefix coda: <http://example.org/coda#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+######################################################################
+# UAE GEOGRAPHIC AGGREGATION: UAE = DUBAI + DIFC
+######################################################################
+
+# UAE Aggregation Rule
+coda:UAEAggregationRule rdf:type coda:ContextualRule ;
+    coda:hasTriggerPhrase "United Arab Emirates" ;
+    coda:hasAlternativeTriggers ("UAE", "U.A.E") ;
+    coda:hasFilterCondition "GLB_FINAL_COUNTRY_NAME IN ('DUBAI', 'DIFC')" ;
+    coda:hasRulePriority 10 .
+
+
+######################################################################
+# WEIGHTED MATURITY AND YIELD PATTERNS
+######################################################################
+
+# 1. Weighted Maturity Pattern
+coda:WeightedMaturityYieldPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Weighted Maturity Yield Pattern" ;
+    coda:hasPatternKeywords (
+        "weighted average maturity"
+        "average maturity weighted"
+        "maturity weighted by notional"
+        "average maturity"
+        "average maturity yield weighted by notional"
+        "maturity yield weighted by notional"
+        "weighted average maturity yield",
+        "average residual maturity weighted by notional",
+        "weighted average maturity by notional",
+        "weighted average maturity weighted by notional",
+        "maturity weighted by notional amount"
+        "average maturity"
+        "average maturity yield weighted by notional amount"
+        "maturity yield weighted by notional amount"
+        "weighted average maturity yield",
+        "average residual maturity weighted by notional amount",
+        "weighted average maturity by notional amount",
+        "weighted average maturity weighted by notional amount"
+    ) ;
+    coda:hasPatternIntent coda:MaturityYieldIntent .
+
+# 2. Weighted Yield Pattern (existing, enhanced)
+coda:WeightedYieldPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Weighted Yield Pattern" ;
+    coda:hasPatternKeywords (
+        "average market yield weighted by notional"
+        "average holding yield weighted by notional"
+        "weighted average yield"
+        "yield weighted by notional"
+        "average market and average holding yield both weighted by notional"
+        "weighted average market and weighted average holding yield by notional"
+    ) ;
+    coda:hasPatternIntent coda:YieldIntent .
+
+######################################################################
+# DEDICATED MEASURE REQUIREMENTS
+######################################################################
+
+# 1. Market Yield Weighted Measure
+coda:MarketYieldWeightedMeasure rdf:type coda:ExplicitMeasureRequirement ;
+    coda:hasWeightedFormula "SUM(GLB_NOTIONAL_USD * GLB_MARKET_YIELD) / SUM(GLB_NOTIONAL_USD)" ;
+    coda:hasDisplayName "AVG_MARKET_YIELD" ;
+    coda:hasOutputFormula "TO_VARCHAR(SUM(GLB_NOTIONAL_USD * GLB_MARKET_YIELD) / SUM(GLB_NOTIONAL_USD)) AS AVG_MARKET_YIELD" .
+
+# 2. Holding Yield Weighted Measure
+coda:HoldingYieldWeightedMeasure rdf:type coda:ExplicitMeasureRequirement ;
+    coda:hasWeightedFormula "SUM(GLB_NOTIONAL_USD * GLB_YIELD_IMPACT) / SUM(GLB_NOTIONAL_USD)" ;
+    coda:hasDisplayName "AVG_HOLDING_YIELD" ;
+    coda:hasOutputFormula "TO_VARCHAR(SUM(GLB_NOTIONAL_USD * GLB_YIELD_IMPACT) / SUM(GLB_NOTIONAL_USD)) AS AVG_HOLDING_YIELD" .
+
+# 3. Maturity Yield Weighted Measure (NEW)
+coda:MaturityYieldWeightedMeasure rdf:type coda:ExplicitMeasureRequirement ;
+    coda:hasWeightedFormula "ROUND(SUM(DAYS_BETWEEN(GLB_REPORT_DATE,GLB_MATURITY_DATE) * GLB_NOTIONAL_USD) / SUM(GLB_NOTIONAL_USD)/365,2)" ;
+    coda:hasDisplayName "AVG_MATURITY_YIELD" ;
+    coda:hasOutputFormula "TO_VARCHAR(ROUND(SUM(DAYS_BETWEEN(GLB_REPORT_DATE,GLB_MATURITY_DATE) * GLB_NOTIONAL_USD) / SUM(GLB_NOTIONAL_USD)/365,2)) AS AVG_MATURITY_YIELD" .
+
+######################################################################
+# CONTEXTUAL DETECTION RULES
+######################################################################
+
+# 1. Market Yield Weighted Rule
+coda:MarketYieldWeightedRule rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "market yield weighted by notional" ;
+    coda:hasMeasureRequirement coda:MarketYieldWeightedMeasure ;
+    coda:hasRulePriority 1 .
+
+# 2. Holding Yield Weighted Rule
+coda:HoldingYieldWeightedRule rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "holding yield weighted by notional" ;
+    coda:hasMeasureRequirement coda:HoldingYieldWeightedMeasure ;
+    coda:hasRulePriority 1 .
+
+# 3. Maturity Yield Weighted Rule (NEW)
+coda:MaturityYieldWeightedRule rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "maturity yield weighted by notional" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 1 .
+
+# 4. Average Maturity Rule (NEW)
+coda:AverageMaturityRule rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "average maturity" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 1 .
+
+# 5. Weighted Average Maturity Rule (NEW)
+coda:WeightedAverageMaturityRule rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "weighted average maturity" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 2 .
+
+######################################################################
+# INTENT DEFINITIONS
+######################################################################
+
+# Existing Yield Intent
+coda:YieldIntent rdf:type coda:Intent ;
+    rdfs:label "Yield Intent" ;
+    rdfs:comment "Intent for yield-related calculations and analysis" .
+
+# New Maturity Yield Intent
+coda:MaturityYieldIntent rdf:type coda:Intent ;
+    rdfs:label "Maturity Yield Intent" ;
+    rdfs:comment "Intent for maturity-related yield calculations analysis" .
+
+######################################################################
+# PROPERTY DEFINITIONS
+######################################################################
+
+coda:hasWeightedFormula rdf:type owl:DatatypeProperty ;
+    rdfs:label "has weighted formula" ;
+    rdfs:comment "The mathematical formula for weighted calculations" ;
+    rdfs:range xsd:string .
+
+coda:hasDisplayName rdf:type owl:DatatypeProperty ;
+    rdfs:label "has display name" ;
+    rdfs:comment "The display name for the calculated measure" ;
+    rdfs:range xsd:string .
+
+coda:hasTriggerPhrase rdf:type owl:DatatypeProperty ;
+    rdfs:label "has trigger phrase" ;
+    rdfs:comment "The phrase that triggers this rule" ;
+    rdfs:range xsd:string .
+
+coda:hasOutputFormula rdf:type owl:DatatypeProperty ;
+    rdfs:label "has output formula" ;
+    rdfs:comment "The complete SQL formula with output formatting" ;
+    rdfs:range xsd:string .
+
+coda:hasPatternIntent rdf:type owl:ObjectProperty ;
+    rdfs:label "has pattern intent" ;
+    rdfs:comment "Links a pattern to its associated intent" ;
+    rdfs:range coda:Intent .
+
+coda:hasApplicableIntent rdf:type owl:ObjectProperty ;
+    rdfs:label "has applicable intent" ;
+    rdfs:comment "The intent this rule applies to" ;
+    rdfs:range coda:Intent .
+
+coda:hasMeasureRequirement rdf:type owl:ObjectProperty ;
+    rdfs:label "has measure requirement" ;
+    rdfs:comment "The measure requirement for this rule" ;
+    rdfs:range coda:ExplicitMeasureRequirement .
+
+coda:hasRulePriority rdf:type owl:DatatypeProperty ;
+    rdfs:label "has rule priority" ;
+    rdfs:comment "Priority level for rule application (higher numbers = higher priority)" ;
+    rdfs:range xsd:integer .
+
+######################################################################
+# USAGE DOCUMENTATION
+######################################################################
+# When user input contains:
+# - "average market yield weighted by notional" → Use MarketYieldWeightedMeasure
+# - "average holding yield weighted by notional" → Use HoldingYieldWeightedMeasure
+# - "average maturity yield weighted by notional" → Use MaturityYieldWeightedMeasure
+# - "weighted average maturity" → Use MaturityYieldWeightedMeasure
+# - "average maturity" → Use MaturityYieldWeightedMeasure
+
+# 
+# Formula outputs:
+# - Market: TO_VARCHAR(SUM(GLB_NOTIONAL_USD * GLB_MARKET_YIELD) / SUM(GLB_NOTIONAL_USD)) AS AVG_MARKET_YIELD
+# - Holding: TO_VARCHAR(SUM(GLB_NOTIONAL_USD * GLB_YIELD_IMPACT) / SUM(GLB_NOTIONAL_USD)) AS AVG_HOLDING_YIELD  
+# - Maturity: TO_VARCHAR(ROUND(SUM(DAYS_BETWEEN(GLB_REPORT_DATE,GLB_MATURITY_DATE) * GLB_NOTIONAL_USD) / SUM(GLB_NOTIONAL_USD)/365,2)) AS AVG_MATURITY_YIELD
+
+######################################################################
+# (NEW) Enhanced Temporal Analysis Extension for "Over the period"
+######################################################################
+
+# 1. New Class: OverPeriodTemporalPattern
+coda:OverPeriodTemporalPattern rdf:type owl:Class ;
+    rdfs:label "Over Period Temporal Pattern" ;
+    rdfs:comment "Indicates temporal analysis over a period, covering month and year granularity." ;
+    rdfs:subClassOf coda:TemporalPattern .
+
+# 2. New Intent Pattern: OverPeriodIntentPattern
+coda:OverPeriodIntentPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Over Period Intent Pattern" ;
+    rdfs:comment "Intent pattern for detecting 'over the period' or similar temporal analysis requests." ;
+    coda:hasPatternIntent coda:TrendAnalysisIntent ;
+    coda:hasPatternKeywords "over the period" .
+
+# 3. Monthly & Yearly Detection Rule for Semantic Parser
+coda:OverPeriodMonthlyDetectionRule rdf:type coda:MonthlyDetectionRule ;
+    rdfs:label "Over Period Monthly Detection Rule" ;
+    rdfs:comment "Rule to detect 'over the period' for grouping by year and month." ;
+    coda:hasTriggerPhrase "over the period" ;
+    coda:hasGroupByClause "GROUP BY YEAR(<date_field>), MONTH(<date_field>)" ;
+    coda:appliesToPattern coda:OverPeriodTemporalPattern .
+
+# 4. Extension to Enhanced Temporal Analyzer
+coda:EnhancedTemporalAnalyzer rdf:type owl:Class ;
+    rdfs:label "Enhanced Temporal Analyzer" ;
+    rdfs:comment "Analyzer that supports advanced temporal patterns and periodic grouping." ;
+    coda:hasMonthlyDetectionRule coda:OverPeriodMonthlyDetectionRule .
+
+# 5. Pattern Matching Behavior (pseudo-specification for developers)
+# IF user query matches coda:OverPeriodIntentPattern OR contains coda:hasPatternKeywords,
+# THEN instantiate coda:OverPeriodTemporalPattern and apply coda:OverPeriodMonthlyDetectionRule in temporal resolution.
+
+######################################################################
+# ALL OTHER LOGIC AND EXISTING ONTOLOGY ELEMENTS ARE UNTOUCHED
+######################################################################
+
+
+coda:YieldIntentPattern rdf:type coda:IntentPattern ;
+    coda:hasPatternKeywords ("yield" "yields") ;
+    coda:hasPatternIntent coda:YieldIntent .
+
+coda:YieldIntent rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentType ;
+    rdfs:label "Yield Intent" .
+
+coda:YieldMeasureRequirement rdf:type coda:ExplicitMeasureRequirement ;
+    coda:hasMeasureColumns ( "GLB_MARKET_YIELD" "GLB_YIELD_IMPACT" ) ;
+    coda:hasAggregationFunction "AVG" .
+
+coda:YieldMeasureRule rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasMeasureRequirement coda:YieldMeasureRequirement .
+    
+
+# Example of usage context (optional; not part of required change)
+# coda:SomeUserQuery
+#     coda:matchesPattern coda:OverPeriodIntentPattern ;
+#     coda:interpretedAs coda:OverPeriodTemporalPattern .
+
+# Existing elements can reference the new properties/rules as needed,
+# but there are NO changes to prior ontology structure or logic.
+
+# ==============================================
+# CORE DYNAMIC CODA AGENT
+# ==============================================
+
+coda:DynamicCODAAgent rdf:type owl:Class ;
+    rdfs:label "Dynamic CODA Agent" ;
+    rdfs:comment "Enhanced CODA agent with advanced user input analysis and intelligent SQL generation" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasInputAnalyzer ;
+        owl:someValuesFrom coda:AdvancedInputAnalyzer
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasRuleEngine ;
+        owl:someValuesFrom coda:DynamicRuleEngine
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasDataModel ;
+        owl:someValuesFrom coda:TreasuryDataModel
+    ] .
+
+# ==============================================
+# ADVANCED INPUT ANALYZER
+# ==============================================
+
+coda:AdvancedInputAnalyzer rdf:type owl:Class ;
+    rdfs:label "Advanced Input Analyzer" ;
+    rdfs:comment "Analyzes user input to extract intent, temporal patterns, and measure requirements" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasIntentClassifier ;
+        owl:someValuesFrom coda:IntentClassifier
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasTemporalAnalyzer ;
+        owl:someValuesFrom coda:TemporalAnalyzer
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasMeasureAnalyzer ;
+        owl:someValuesFrom coda:MeasureAnalyzer
+    ] .
+
+# ==============================================
+# INTENT CLASSIFICATION
+# ==============================================
+
+coda:IntentClassifier rdf:type owl:Class ;
+    rdfs:label "Intent Classifier" ;
+    rdfs:comment "Classifies user intent for appropriate query generation" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasIntentType ;
+        owl:someValuesFrom coda:IntentType
+    ] .
+
+coda:IntentType rdf:type owl:Class ;
+    rdfs:label "Intent Type" ;
+    rdfs:comment "Base class for different types of user intents" .
+
+coda:DistributionIntent rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentType ;
+    rdfs:label "Distribution Intent" ;
+    rdfs:comment "User wants to see data distribution across time periods or dimensions" .
+
+coda:TrendAnalysisIntent rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentType ;
+    rdfs:label "Trend Analysis Intent" ;
+    rdfs:comment "User wants to analyze trends over time" .
+
+coda:SummaryIntent rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentType ;
+    rdfs:label "Summary Intent" ;
+    rdfs:comment "User wants summary/aggregate information" .
+
+coda:ComparisonIntent rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentType ;
+    rdfs:label "Comparison Intent" ;
+    rdfs:comment "User wants to compare data across different dimensions" .
+
+coda:PointInTimeIntent rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentType ;
+    rdfs:label "Point In Time Intent" ;
+    rdfs:comment "User wants data for a specific point in time" .
+
+# ==============================================
+# TEMPORAL ANALYSIS
+# ==============================================
+
+coda:TemporalAnalyzer rdf:type owl:Class ;
+    rdfs:label "Temporal Analyzer" ;
+    rdfs:comment "Analyzes temporal requirements and patterns in user input" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasTemporalPattern ;
+        owl:someValuesFrom coda:TemporalPattern
+    ] .
+
+coda:EnhancedTemporalAnalyzer rdf:type owl:Class ;
+    rdfs:subClassOf coda:TemporalAnalyzer ;
+    rdfs:label "Enhanced Temporal Analyzer" ;
+    rdfs:comment "Enhanced analyzer with improved detection for monthly patterns" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasMonthlyDetectionRule ;
+        owl:someValuesFrom coda:MonthlyDetectionRule
+    ] .
+
+coda:TemporalPattern rdf:type owl:Class ;
+    rdfs:label "Temporal Pattern" ;
+    rdfs:comment "Base class for temporal patterns in user requests" .
+
+coda:MonthlyDistributionPattern rdf:type owl:Class ;
+    rdfs:subClassOf coda:TemporalPattern ;
+    rdfs:label "Monthly Distribution Pattern" ;
+    rdfs:comment "Pattern indicating user wants monthly distribution (across months, by month, each month)" .
+
+coda:YearlyDistributionPattern rdf:type owl:Class ;
+    rdfs:subClassOf coda:TemporalPattern ;
+    rdfs:label "Yearly Distribution Pattern" ;
+    rdfs:comment "Pattern indicating user wants yearly distribution" .
+
+coda:QuarterlyDistributionPattern rdf:type owl:Class ;
+    rdfs:subClassOf coda:TemporalPattern ;
+    rdfs:label "Quarterly Distribution Pattern" ;
+    rdfs:comment "Pattern indicating user wants quarterly distribution" .
+
+coda:SpecificDatePattern rdf:type owl:Class ;
+    rdfs:subClassOf coda:TemporalPattern ;
+    rdfs:label "Specific Date Pattern" ;
+    rdfs:comment "Pattern indicating user wants data for specific dates" .
+
+coda:LatestDataPattern rdf:type owl:Class ;
+    rdfs:subClassOf coda:TemporalPattern ;
+    rdfs:label "Latest Data Pattern" ;
+    rdfs:comment "Pattern indicating user wants latest available data" .
+
+# ==============================================
+# MONTHLY DETECTION RULES
+# ==============================================
+
+coda:MonthlyDetectionRule rdf:type owl:Class ;
+    rdfs:label "Monthly Detection Rule" ;
+    rdfs:comment "Rules for detecting monthly distribution requests" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasTriggerPhrase ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasGroupByClause ;
+        owl:someValuesFrom xsd:string
+    ] .
+
+# ==============================================
+# MEASURE ANALYSIS
+# ==============================================
+
+coda:MeasureAnalyzer rdf:type owl:Class ;
+    rdfs:label "Measure Analyzer" ;
+    rdfs:comment "Analyzes measure requirements and applies defaults" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasMeasureRequirement ;
+        owl:someValuesFrom coda:MeasureRequirement
+    ] .
+
+coda:MeasureRequirement rdf:type owl:Class ;
+    rdfs:label "Measure Requirement" ;
+    rdfs:comment "Requirements for measures in the query" .
+
+coda:ExplicitMeasureRequirement rdf:type owl:Class ;
+    rdfs:subClassOf coda:MeasureRequirement ;
+    rdfs:label "Explicit Measure Requirement" ;
+    rdfs:comment "User explicitly specified measures" .
+
+coda:DefaultMeasureRequirement rdf:type owl:Class ;
+    rdfs:subClassOf coda:MeasureRequirement ;
+    rdfs:label "Default Measure Requirement" ;
+    rdfs:comment "Default measures when none specified (sum of amount fields)" .
+
+coda:AggregationRequirement rdf:type owl:Class ;
+    rdfs:label "Aggregation Requirement" ;
+    rdfs:comment "Specific aggregation requirements (SUM, COUNT, AVG, etc.)" .
+
+# ==============================================
+# ENHANCED RULE ENGINE
+# ==============================================
+
+coda:DynamicRuleEngine rdf:type owl:Class ;
+    rdfs:label "Dynamic Rule Engine" ;
+    rdfs:comment "Enhanced rule engine with intent-aware processing" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasRuleSet ;
+        owl:someValuesFrom coda:SQLGenerationRuleSet
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasContextualRuleSet ;
+        owl:someValuesFrom coda:ContextualRuleSet
+    ] .
+
+coda:ContextualRuleSet rdf:type owl:Class ;
+    rdfs:label "Contextual Rule Set" ;
+    rdfs:comment "Rules that adapt based on user intent and context" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasContextualRule ;
+        owl:someValuesFrom coda:ContextualRule
+    ] .
+
+coda:ContextualRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DynamicRule ;
+    rdfs:label "Contextual Rule" ;
+    rdfs:comment "Rule that adapts based on user intent and context" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasApplicableIntent ;
+        owl:someValuesFrom coda:IntentType
+    ] .
+
+# ==============================================
+# ENHANCED DATE HANDLING RULES
+# ==============================================
+
+coda:DateHandlingRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:ContextualRule ;
+    rdfs:label "Date Handling Rule" ;
+    rdfs:comment "Enhanced rules for intelligent date processing based on intent" .
+
+coda:DistributionDateRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DateHandlingRule ;
+    rdfs:label "Distribution Date Rule" ;
+    rdfs:comment "Rule: For distribution requests, do NOT use MAX date filter - include all available dates" ;
+    coda:hasApplicableIntent coda:DistributionIntent .
+
+coda:TrendAnalysisDateRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DateHandlingRule ;
+    rdfs:label "Trend Analysis Date Rule" ;
+    rdfs:comment "Rule: For trend analysis, include all dates in range without MAX filter" ;
+    coda:hasApplicableIntent coda:TrendAnalysisIntent .
+
+coda:PointInTimeMaxDateRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DateHandlingRule ;
+    rdfs:label "Point In Time Max Date Rule" ;
+    rdfs:comment "Rule: For point-in-time requests, use MAX(GLB_REPORT_DATE) or specific date" ;
+    coda:hasApplicableIntent coda:PointInTimeIntent .
+
+coda:MonthlyGroupingRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DateHandlingRule ;
+    rdfs:label "Monthly Grouping Rule" ;
+    rdfs:comment "Rule: For monthly distribution, GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" ;
+    coda:hasApplicableIntent coda:DistributionIntent .
+
+coda:EnhancedMonthlyGroupingRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DateHandlingRule ;
+    rdfs:label "Enhanced Monthly Grouping Rule" ;
+    rdfs:comment "Rule: For requests including 'across the months' or similar phrases, apply monthly grouping with YEAR and MONTH" ;
+    coda:hasApplicableIntent coda:DistributionIntent .
+
+coda:YearlyGroupingRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:DateHandlingRule ;
+    rdfs:label "Yearly Grouping Rule" ;
+    rdfs:comment "Rule: For yearly distribution, GROUP BY YEAR(GLB_REPORT_DATE)" ;
+    coda:hasApplicableIntent coda:DistributionIntent .
+
+# ==============================================
+# ENHANCED MEASURE RULES
+# ==============================================
+
+coda:MeasureRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:ContextualRule ;
+    rdfs:label "Measure Rule" ;
+    rdfs:comment "Rules for handling measures and aggregations" .
+
+coda:DefaultAmountSumRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:MeasureRule ;
+    rdfs:label "Default Amount Sum Rule" ;
+    rdfs:comment "Rule: When no measures specified, default to SUM(amount fields)" ;
+    coda:hasApplicableIntent coda:SummaryIntent ,
+                            coda:DistributionIntent ,
+                            coda:TrendAnalysisIntent .
+
+coda:ExplicitMeasureRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:MeasureRule ;
+    rdfs:label "Explicit Measure Rule" ;
+    rdfs:comment "Rule: When measures are explicitly mentioned, use those instead of defaults" .
+
+coda:AggregationTypeRule rdf:type owl:Class ;
+    rdfs:subClassOf coda:MeasureRule ;
+    rdfs:label "Aggregation Type Rule" ;
+    rdfs:comment "Rule: Determine aggregation type based on user language (sum, count, average, etc.)" .
+
+# ==============================================
+# ENHANCED INTENT DETECTION PATTERNS
+# ==============================================
+
+coda:IntentPattern rdf:type owl:Class ;
+    rdfs:label "Intent Pattern" ;
+    rdfs:comment "Patterns for detecting user intent from input text" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasPatternKeywords ;
+        owl:someValuesFrom rdf:List
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasPatternIntent ;
+        owl:someValuesFrom coda:IntentType
+    ] .
+
+coda:EnhancedDistributionKeywords rdf:type coda:IntentPattern ;
+    rdfs:label "Enhanced Distribution Keywords" ;
+    rdfs:comment "Extended keywords for detecting monthly distribution intent" ;
+    coda:hasPatternKeywords (
+        "distribution" 
+        "across" 
+        "across the months" 
+        "across months"
+        "by month" 
+        "each month" 
+        "monthly breakdown" 
+        "over time" 
+        "trend"
+        "month by month"
+        "monthly basis"
+        "per month"
+        "throughout the months"
+    ) ;
+    coda:hasPatternIntent coda:DistributionIntent .
+
+coda:AcrossMonthsPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Across Months Pattern" ;
+    rdfs:comment "Specific pattern for 'across the months' requests" ;
+    coda:hasPatternKeywords (
+        "across the months"
+        "across months" 
+        "across all months"
+        "through the months"
+        "throughout months"
+    ) ;
+    coda:hasPatternIntent coda:DistributionIntent .
+
+coda:LatestDataKeywords rdf:type coda:IntentPattern ;
+    rdfs:label "Latest Data Keywords" ;
+    rdfs:comment "Keywords indicating latest data intent" ;
+    coda:hasPatternKeywords ("latest" "current" "most recent" "as of" "today") ;
+    coda:hasPatternIntent coda:PointInTimeIntent .
+
+coda:ComparisonKeywords rdf:type coda:IntentPattern ;
+    rdfs:label "Comparison Keywords" ;
+    rdfs:comment "Keywords indicating comparison intent" ;
+    coda:hasPatternKeywords ("compare" "versus" "vs" "difference" "between") ;
+    coda:hasPatternIntent coda:ComparisonIntent .
+
+# ==============================================
+# ENHANCED QUERY GENERATION
+# ==============================================
+
+coda:ContextualQueryGenerator rdf:type owl:Class ;
+    rdfs:label "Contextual Query Generator" ;
+    rdfs:comment "Generates SQL queries based on user intent and context" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasQueryStrategy ;
+        owl:someValuesFrom coda:QueryStrategy
+    ] .
+
+coda:QueryStrategy rdf:type owl:Class ;
+    rdfs:label "Query Strategy" ;
+    rdfs:comment "Strategy for generating queries based on intent" .
+
+coda:DistributionQueryStrategy rdf:type owl:Class ;
+    rdfs:subClassOf coda:QueryStrategy ;
+    rdfs:label "Distribution Query Strategy" ;
+    rdfs:comment "Strategy for generating distribution queries with proper grouping" .
+
+coda:MonthlyDistributionQueryStrategy rdf:type owl:Class ;
+    rdfs:subClassOf coda:DistributionQueryStrategy ;
+    rdfs:label "Monthly Distribution Query Strategy" ;
+    rdfs:comment "Specific strategy for monthly distribution queries with proper date grouping" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasSelectClause ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasGroupByClause ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasOrderByClause ;
+        owl:someValuesFrom xsd:string
+    ] .
+
+coda:PointInTimeQueryStrategy rdf:type owl:Class ;
+    rdfs:subClassOf coda:QueryStrategy ;
+    rdfs:label "Point In Time Query Strategy" ;
+    rdfs:comment "Strategy for generating point-in-time queries with MAX date filtering" .
+
+coda:TrendAnalysisQueryStrategy rdf:type owl:Class ;
+    rdfs:subClassOf coda:QueryStrategy ;
+    rdfs:label "Trend Analysis Query Strategy" ;
+    rdfs:comment "Strategy for generating trend analysis queries" .
+
+# ==============================================
+# ENHANCED TREASURY DATA MODEL
+# ==============================================
+
+coda:TreasuryDataModel rdf:type owl:Class ;
+    rdfs:label "Treasury Data Model" ;
+    rdfs:comment "Enhanced Treasury data model with measure intelligence" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasDefaultMeasures ;
+        owl:someValuesFrom coda:DefaultMeasureSet
+    ] .
+
+coda:DefaultMeasureSet rdf:type owl:Class ;
+    rdfs:label "Default Measure Set" ;
+    rdfs:comment "Set of default measures when none specified" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasDefaultMeasure ;
+        owl:someValuesFrom coda:DefaultMeasure
+    ] .
+
+coda:DefaultMeasure rdf:type owl:Class ;
+    rdfs:label "Default Measure" ;
+    rdfs:comment "A default measure with aggregation function" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasColumnName ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasAggregationFunction ;
+        owl:someValuesFrom xsd:string
+    ] .
+
+# ==============================================
+# ENHANCED PROPERTIES
+# ==============================================
+
+# Input Analysis Properties
+coda:hasInputAnalyzer rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:DynamicCODAAgent ;
+    rdfs:range coda:AdvancedInputAnalyzer .
+
+coda:hasIntentClassifier rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:AdvancedInputAnalyzer ;
+    rdfs:range coda:IntentClassifier .
+
+coda:hasTemporalAnalyzer rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:AdvancedInputAnalyzer ;
+    rdfs:range coda:TemporalAnalyzer .
+
+coda:hasMeasureAnalyzer rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:AdvancedInputAnalyzer ;
+    rdfs:range coda:MeasureAnalyzer .
+
+coda:hasIntentType rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:IntentClassifier ;
+    rdfs:range coda:IntentType .
+
+coda:hasTemporalPattern rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:TemporalAnalyzer ;
+    rdfs:range coda:TemporalPattern .
+
+coda:hasMeasureRequirement rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:MeasureAnalyzer ;
+    rdfs:range coda:MeasureRequirement .
+
+# Enhanced Temporal Analysis Properties
+coda:hasMonthlyDetectionRule rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:EnhancedTemporalAnalyzer ;
+    rdfs:range coda:MonthlyDetectionRule .
+
+coda:hasTriggerPhrase rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:MonthlyDetectionRule ;
+    rdfs:range xsd:string .
+
+coda:hasGroupByClause rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:MonthlyDetectionRule ;
+    rdfs:range xsd:string .
+
+# Contextual Rule Properties
+coda:hasContextualRuleSet rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:DynamicRuleEngine ;
+    rdfs:range coda:ContextualRuleSet .
+
+coda:hasContextualRule rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:ContextualRuleSet ;
+    rdfs:range coda:ContextualRule .
+
+coda:hasApplicableIntent rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:ContextualRule ;
+    rdfs:range coda:IntentType .
+
+# Pattern Properties
+coda:hasPatternKeywords rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:IntentPattern ;
+    rdfs:range rdf:List .
+
+coda:hasPatternIntent rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:IntentPattern ;
+    rdfs:range coda:IntentType .
+
+# Query Strategy Properties
+coda:hasQueryStrategy rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:ContextualQueryGenerator ;
+    rdfs:range coda:QueryStrategy .
+
+coda:hasSelectClause rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:MonthlyDistributionQueryStrategy ;
+    rdfs:range xsd:string .
+
+coda:hasOrderByClause rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:MonthlyDistributionQueryStrategy ;
+    rdfs:range xsd:string .
+
+# Default Measure Properties
+coda:hasDefaultMeasures rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:TreasuryDataModel ;
+    rdfs:range coda:DefaultMeasureSet .
+
+coda:hasDefaultMeasure rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:DefaultMeasureSet ;
+    rdfs:range coda:DefaultMeasure .
+
+coda:hasAggregationFunction rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:DefaultMeasure ;
+    rdfs:range xsd:string .
+
+# ==============================================
+# ENHANCED SAMPLE INSTANCES
+# ==============================================
+
+# Default Measures for Treasury
+coda:TreasuryDefaultMeasures rdf:type coda:DefaultMeasureSet ;
+    coda:hasDefaultMeasure coda:DefaultNotionalUSD ,
+                           coda:DefaultTransactionCount .
+
+coda:DefaultNotionalUSD rdf:type coda:DefaultMeasure ;
+    coda:hasColumnName "GLB_NOTIONAL_USD" ;
+    coda:hasAggregationFunction "SUM" .
+
+coda:DefaultTransactionCount rdf:type coda:DefaultMeasure ;
+    coda:hasColumnName "*" ;
+    coda:hasAggregationFunction "COUNT" .
+
+# Enhanced Treasury Data Model
+coda:TreasuryFactTable rdf:type coda:TreasuryDataModel ;
+    coda:hasDefaultMeasures coda:TreasuryDefaultMeasures .
+
+# Monthly Detection Rule Instances
+coda:AcrossMonthsDetectionRule rdf:type coda:MonthlyDetectionRule ;
+    coda:hasTriggerPhrase "across the months" ;
+    coda:hasGroupByClause "GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" .
+
+coda:AcrossAllMonthsDetectionRule rdf:type coda:MonthlyDetectionRule ;
+    coda:hasTriggerPhrase "across all months" ;
+    coda:hasGroupByClause "GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" .
+
+coda:ThroughMonthsDetectionRule rdf:type coda:MonthlyDetectionRule ;
+    coda:hasTriggerPhrase "through the months" ;
+    coda:hasGroupByClause "GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" .
+
+# Monthly Distribution Query Template
+coda:MonthlyDistributionTemplate rdf:type coda:MonthlyDistributionQueryStrategy ;
+    coda:hasSelectClause "YEAR(GLB_REPORT_DATE) as report_year, MONTH(GLB_REPORT_DATE) as report_month, SUM(GLB_NOTIONAL_USD) as total_notional" ;
+    coda:hasGroupByClause "GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" ;
+    coda:hasOrderByClause "ORDER BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" .
+
+# Enhanced Contextual Rules
+coda:R001_DistributionDateHandling rdf:type coda:DistributionDateRule ;
+    coda:hasRuleId "R001" ;
+    coda:hasRulePriority 1 ;
+    coda:hasApplicableIntent coda:DistributionIntent .
+
+coda:R002_DefaultAmountSum rdf:type coda:DefaultAmountSumRule ;
+    coda:hasRuleId "R002" ;
+    coda:hasRulePriority 2 .
+
+coda:R003_MonthlyGrouping rdf:type coda:MonthlyGroupingRule ;
+    coda:hasRuleId "R003" ;
+    coda:hasRulePriority 3 ;
+    coda:hasApplicableIntent coda:DistributionIntent .
+
+coda:R004_AcrossMonthsGrouping rdf:type coda:EnhancedMonthlyGroupingRule ;
+    coda:hasRuleId "R004" ;
+    coda:hasRulePriority 1 ;
+    coda:hasApplicableIntent coda:DistributionIntent ;
+    rdfs:comment "When user asks for data 'across the months', apply GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)" .
+
+# ==============================================
+# QUERY EXECUTION CONTEXT
+# ==============================================
+
+coda:QueryExecutionContext rdf:type owl:Class ;
+    rdfs:label "Query Execution Context" ;
+    rdfs:comment "Context for query execution with user intent and requirements" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasUserInput ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasDetectedIntent ;
+        owl:someValuesFrom coda:IntentType
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasApplicableRules ;
+        owl:someValuesFrom rdf:List
+    ] .
+
+coda:hasUserInput rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:QueryExecutionContext ;
+    rdfs:range xsd:string .
+
+coda:hasDetectedIntent rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:QueryExecutionContext ;
+    rdfs:range coda:IntentType .
+
+coda:hasApplicableRules rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:QueryExecutionContext ;
+    rdfs:range rdf:List .
+
+# Example Usage Context for "across the months"
+coda:AcrossMonthsQueryContext rdf:type coda:QueryExecutionContext ;
+    coda:hasUserInput "Show me the data across the months" ;
+    coda:hasDetectedIntent coda:DistributionIntent ;
+    coda:hasApplicableRules (coda:R004_AcrossMonthsGrouping coda:R003_MonthlyGrouping) ;
+    rdfs:comment "Example context for 'across the months' request" .
+
+# ==============================================
+# EXECUTION WORKFLOW
+# ==============================================
+
+coda:ExecutionWorkflow rdf:type owl:Class ;
+    rdfs:label "Execution Workflow" ;
+    rdfs:comment "Workflow for processing user input and generating appropriate queries" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasWorkflowStep ;
+        owl:someValuesFrom coda:WorkflowStep
+    ] .
+
+coda:WorkflowStep rdf:type owl:Class ;
+    rdfs:label "Workflow Step" ;
+    rdfs:comment "A step in the query generation workflow" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasStepOrder ;
+        owl:someValuesFrom xsd:integer
+    ] .
+
+coda:InputAnalysisStep rdf:type owl:Class ;
+    rdfs:subClassOf coda:WorkflowStep ;
+    rdfs:label "Input Analysis Step" ;
+    rdfs:comment "Step 1: Analyze user input for intent and requirements" .
+
+coda:IntentClassificationStep rdf:type owl:Class ;
+    rdfs:subClassOf coda:WorkflowStep ;
+    rdfs:label "Intent Classification Step" ;
+    rdfs:comment "Step 2: Classify user intent" .
+
+coda:MonthlyDetectionWorkflowStep rdf:type owl:Class ;
+    rdfs:subClassOf coda:IntentClassificationStep ;
+    rdfs:label "Monthly Detection Workflow Step" ;
+    rdfs:comment "Enhanced step to specifically detect monthly distribution patterns" ;
+    coda:hasStepOrder 2 .
+
+coda:RuleSelectionStep rdf:type owl:Class ;
+    rdfs:subClassOf coda:WorkflowStep ;
+    rdfs:label "Rule Selection Step" ;
+    rdfs:comment "Step 3: Select applicable rules based on intent" .
+
+coda:QueryGenerationStep rdf:type owl:Class ;
+    rdfs:subClassOf coda:WorkflowStep ;
+    rdfs:label "Query Generation Step" ;
+    rdfs:comment "Step 4: Generate SQL query using selected rules" .
+
+coda:hasWorkflowStep rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:ExecutionWorkflow ;
+    rdfs:range coda:WorkflowStep .
+
+coda:hasStepOrder rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:WorkflowStep ;
+    rdfs:range xsd:integer .
+
+
+@prefix : <http://example.org/ontology#> .
+@prefix coda: <http://example.org/coda#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+######################################################################
+# (NEW) Enhanced Temporal Analysis Extension for "Over the period"
+######################################################################
+
+# 1. New Class: OverPeriodTemporalPattern
+coda:OverPeriodTemporalPattern rdf:type owl:Class ;
+    rdfs:label "Over Period Temporal Pattern" ;
+    rdfs:comment "Indicates temporal analysis over a period, covering month and year granularity." ;
+    rdfs:subClassOf coda:TemporalPattern .
+
+# 2. New Intent Pattern: OverPeriodIntentPattern
+coda:OverPeriodIntentPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Over Period Intent Pattern" ;
+    rdfs:comment "Intent pattern for detecting 'over the period' or similar temporal analysis requests." ;
+    coda:hasPatternIntent coda:TrendAnalysisIntent ;
+    coda:hasPatternKeywords "over the period" .
+
+# 3. Monthly & Yearly Detection Rule for Semantic Parser
+coda:OverPeriodMonthlyDetectionRule rdf:type coda:MonthlyDetectionRule ;
+    rdfs:label "Over Period Monthly Detection Rule" ;
+    rdfs:comment "Rule to detect 'over the period' for grouping by year and month." ;
+    coda:hasTriggerPhrase "over the period" ;
+    coda:hasGroupByClause "GROUP BY YEAR(<date_field>), MONTH(<date_field>)" ;
+    coda:appliesToPattern coda:OverPeriodTemporalPattern .
+
+# 4. Extension to Enhanced Temporal Analyzer
+coda:EnhancedTemporalAnalyzer rdf:type owl:Class ;
+    rdfs:label "Enhanced Temporal Analyzer" ;
+    rdfs:comment "Analyzer that supports advanced temporal patterns and periodic grouping." ;
+    coda:hasMonthlyDetectionRule coda:OverPeriodMonthlyDetectionRule .
+
+# 5. Pattern Matching Behavior (pseudo-specification for developers)
+# IF user query matches coda:OverPeriodIntentPattern OR contains coda:hasPatternKeywords,
+# THEN instantiate coda:OverPeriodTemporalPattern and apply coda:OverPeriodMonthlyDetectionRule in temporal resolution.
+
+######################################################################
+# ALL OTHER LOGIC AND EXISTING ONTOLOGY ELEMENTS ARE UNTOUCHED
+######################################################################
+
+# Example of usage context (optional; not part of required change)
+# coda:SomeUserQuery
+#     coda:matchesPattern coda:OverPeriodIntentPattern ;
+#     coda:interpretedAs coda:OverPeriodTemporalPattern .
+
+# Existing elements can reference the new properties/rules as needed,
+# but there are NO changes to prior ontology structure or logic.
+
+
+@prefix : <http://example.org/ontology#> .
+@prefix coda: <http://example.org/coda#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+######################################################################
+# Enhanced Support: "over the n periods" (anchored to max report date)
+######################################################################
+
+# 1. "N-Period" Temporal Pattern (already defined previously)
+coda:NPeriodTemporalPattern rdf:type owl:Class ;
+    rdfs:label "N Period Temporal Pattern" ;
+    rdfs:comment "Temporal pattern for analysis over the last N periods (e.g., months, quarters, years)." ;
+    rdfs:subClassOf coda:TemporalPattern .
+
+# 2. Intent Pattern for N-Period Requests (already defined previously)
+coda:NPeriodIntentPattern rdf:type coda:IntentPattern ;
+    rdfs:label "N Period Intent Pattern" ;
+    rdfs:comment "Intent pattern for detecting 'over the N periods' for temporal analysis." ;
+    coda:hasPatternIntent coda:TrendAnalysisIntent ;
+    coda:hasPatternKeywords "over the" , "periods" .
+
+# 3. Improved Detection Rule
+coda:NPeriodDetectionRule rdf:type coda:MonthlyDetectionRule ;
+    rdfs:label "N Period Detection Rule" ;
+    rdfs:comment "Rule that triggers when N periods are specified, grouping by month and filtering based on max date in report." ;
+    coda:hasTriggerPattern "over the [0-9]+ periods" ;
+    coda:hasGroupByClause "GROUP BY YEAR(<date_field>), MONTH(<date_field>)" ;
+    coda:hasDateFilter """
+      WHERE <date_field> >= DATEADD(MONTH, -$N+1, (SELECT MAX(<date_field>) FROM <report_table>))
+        AND <date_field> <= (SELECT MAX(<date_field>) FROM <report_table>)
+    """ ;
+    coda:appliesToPattern coda:NPeriodTemporalPattern .
+
+# 4. Attach to EnhancedTemporalAnalyzer
+coda:EnhancedTemporalAnalyzer coda:hasMonthlyDetectionRule coda:NPeriodDetectionRule .
+
+
+
+# ==============================================
+# ENHANCED WEIGHTED MEASURE DETECTION SYSTEM
+# ==============================================
+
+@prefix coda: <http://example.org/coda#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+######################################################################
+# ENHANCED PATTERN MATCHING FOR WEIGHTED MEASURES
+######################################################################
+
+# 1. Enhanced Weighted Maturity Pattern (More comprehensive keywords)
+coda:WeightedMaturityYieldPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Weighted Maturity Yield Pattern" ;
+    coda:hasPatternKeywords (
+        "weighted average maturity"
+        "average maturity weighted"
+        "maturity weighted by notional"
+        "average maturity"
+        "average maturity yield weighted by notional"
+        "maturity yield weighted by notional"
+        "weighted average maturity yield"
+        "average residual maturity weighted by notional"
+        "weighted average maturity by notional"
+        "weighted average maturity weighted by notional"
+        "maturity weighted by notional amount"
+        "average maturity yield weighted by notional amount"
+        "maturity yield weighted by notional amount"
+        "weighted average maturity yield"
+        "average residual maturity weighted by notional amount"
+        "weighted average maturity by notional amount"
+        "weighted average maturity weighted by notional amount"
+        "weighted maturity"
+        "maturity weighted"
+        "avg maturity weighted"
+        "average maturity weighted by notional"
+    ) ;
+    coda:hasPatternIntent coda:MaturityYieldIntent ;
+    coda:hasPatternPriority 10 .
+
+# 2. Enhanced Market Yield Pattern
+coda:WeightedMarketYieldPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Weighted Market Yield Pattern" ;
+    coda:hasPatternKeywords (
+        "average market yield weighted by notional"
+        "market yield weighted by notional"
+        "weighted average market yield"
+        "weighted market yield"
+        "avg market yield weighted"
+        "market yield weighted"
+        "average market yield weighted by notional amount"
+        "market yield weighted by notional amount"
+    ) ;
+    coda:hasPatternIntent coda:YieldIntent ;
+    coda:hasPatternPriority 10 .
+
+# 3. Enhanced Holding Yield Pattern
+coda:WeightedHoldingYieldPattern rdf:type coda:IntentPattern ;
+    rdfs:label "Weighted Holding Yield Pattern" ;
+    coda:hasPatternKeywords (
+        "average holding yield weighted by notional"
+        "holding yield weighted by notional"
+        "weighted average holding yield"
+        "weighted holding yield"
+        "avg holding yield weighted"
+        "holding yield weighted"
+        "average holding yield weighted by notional amount"
+        "holding yield weighted by notional amount"
+    ) ;
+    coda:hasPatternIntent coda:YieldIntent ;
+    coda:hasPatternPriority 10 .
+
+######################################################################
+# ENHANCED CONTEXTUAL RULES WITH BETTER TRIGGERS
+######################################################################
+
+# 1. Enhanced Market Yield Weighted Rules (Multiple trigger variations)
+coda:MarketYieldWeightedRule1 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "market yield weighted by notional" ;
+    coda:hasMeasureRequirement coda:MarketYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:MarketYieldWeightedRule2 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "average market yield weighted" ;
+    coda:hasMeasureRequirement coda:MarketYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:MarketYieldWeightedRule3 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "weighted market yield" ;
+    coda:hasMeasureRequirement coda:MarketYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+# 2. Enhanced Holding Yield Weighted Rules
+coda:HoldingYieldWeightedRule1 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "holding yield weighted by notional" ;
+    coda:hasMeasureRequirement coda:HoldingYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:HoldingYieldWeightedRule2 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "average holding yield weighted" ;
+    coda:hasMeasureRequirement coda:HoldingYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:HoldingYieldWeightedRule3 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:YieldIntent ;
+    coda:hasTriggerPhrase "weighted holding yield" ;
+    coda:hasMeasureRequirement coda:HoldingYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+# 3. Enhanced Maturity Yield Weighted Rules (Multiple trigger variations)
+coda:MaturityYieldWeightedRule1 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "maturity yield weighted by notional" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:MaturityYieldWeightedRule2 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "average maturity weighted" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:MaturityYieldWeightedRule3 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "weighted average maturity" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:MaturityYieldWeightedRule4 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "weighted maturity" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 10 .
+
+coda:MaturityYieldWeightedRule5 rdf:type coda:ContextualRule ;
+    coda:hasApplicableIntent coda:MaturityYieldIntent ;
+    coda:hasTriggerPhrase "average maturity" ;
+    coda:hasMeasureRequirement coda:MaturityYieldWeightedMeasure ;
+    coda:hasRulePriority 9 .
+
+######################################################################
+# ENHANCED INTENT DETECTION SYSTEM
+######################################################################
+
+# Enhanced Intent Detector with better pattern matching
+coda:EnhancedWeightedIntentDetector rdf:type owl:Class ;
+    rdfs:label "Enhanced Weighted Intent Detector" ;
+    rdfs:comment "Improved detector for weighted measure intents with fuzzy matching" ;
+    rdfs:subClassOf coda:IntentClassifier ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasPartialMatchingRule ;
+        owl:someValuesFrom coda:PartialMatchingRule
+    ] .
+
+# Partial matching rules for better detection
+coda:PartialMatchingRule rdf:type owl:Class ;
+    rdfs:label "Partial Matching Rule" ;
+    rdfs:comment "Rules for partial text matching to catch variations" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasMatchPattern ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasMatchThreshold ;
+        owl:someValuesFrom xsd:float
+    ] .
+
+# Specific partial matching rules
+coda:MaturityPartialMatch rdf:type coda:PartialMatchingRule ;
+    coda:hasMatchPattern ".*maturity.*weighted.*" ;
+    coda:hasMatchThreshold 0.8 ;
+    coda:hasTargetIntent coda:MaturityYieldIntent ;
+    coda:hasTargetMeasure coda:MaturityYieldWeightedMeasure .
+
+coda:MarketYieldPartialMatch rdf:type coda:PartialMatchingRule ;
+    coda:hasMatchPattern ".*market.*yield.*weighted.*" ;
+    coda:hasMatchThreshold 0.8 ;
+    coda:hasTargetIntent coda:YieldIntent ;
+    coda:hasTargetMeasure coda:MarketYieldWeightedMeasure .
+
+coda:HoldingYieldPartialMatch rdf:type coda:PartialMatchingRule ;
+    coda:hasMatchPattern ".*holding.*yield.*weighted.*" ;
+    coda:hasMatchThreshold 0.8 ;
+    coda:hasTargetIntent coda:YieldIntent ;
+    coda:hasTargetMeasure coda:HoldingYieldWeightedMeasure .
+
+######################################################################
+# ENHANCED RULE PROCESSOR
+######################################################################
+
+# Enhanced rule processor with better matching
+coda:EnhancedWeightedRuleProcessor rdf:type owl:Class ;
+    rdfs:label "Enhanced Weighted Rule Processor" ;
+    rdfs:comment "Improved processor for weighted measure rules with better pattern matching" ;
+    rdfs:subClassOf coda:DynamicRuleEngine ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasPreProcessingStep ;
+        owl:someValuesFrom coda:TextNormalizationStep
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty coda:hasMatchingAlgorithm ;
+        owl:someValuesFrom coda:FuzzyMatchingAlgorithm
+    ] .
+
+# Text normalization for better matching
+coda:TextNormalizationStep rdf:type owl:Class ;
+    rdfs:label "Text Normalization Step" ;
+    rdfs:comment "Normalizes input text for better pattern matching" ;
+    coda:hasNormalizationRules (
+        "lowercase_conversion"
+        "remove_extra_spaces"
+        "standardize_synonyms"
+        "expand_abbreviations"
+    ) .
+
+# Fuzzy matching algorithm
+coda:FuzzyMatchingAlgorithm rdf:type owl:Class ;
+    rdfs:label "Fuzzy Matching Algorithm" ;
+    rdfs:comment "Algorithm for fuzzy text matching to catch variations" ;
+    coda:hasMatchingStrategy "partial_string_match" ;
+    coda:hasMinimumConfidence 0.75 .
+
+######################################################################
+# ENHANCED PROPERTIES
+######################################################################
+
+coda:hasPatternPriority rdf:type owl:DatatypeProperty ;
+    rdfs:label "has pattern priority" ;
+    rdfs:comment "Priority level for pattern matching (higher = more priority)" ;
+    rdfs:range xsd:integer .
+
+coda:hasPartialMatchingRule rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:EnhancedWeightedIntentDetector ;
+    rdfs:range coda:PartialMatchingRule .
+
+coda:hasMatchPattern rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:PartialMatchingRule ;
+    rdfs:range xsd:string .
+
+coda:hasMatchThreshold rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:PartialMatchingRule ;
+    rdfs:range xsd:float .
+
+coda:hasTargetIntent rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:PartialMatchingRule ;
+    rdfs:range coda:IntentType .
+
+coda:hasTargetMeasure rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:PartialMatchingRule ;
+    rdfs:range coda:ExplicitMeasureRequirement .
+
+coda:hasPreProcessingStep rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:EnhancedWeightedRuleProcessor ;
+    rdfs:range coda:TextNormalizationStep .
+
+coda:hasMatchingAlgorithm rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:EnhancedWeightedRuleProcessor ;
+    rdfs:range coda:FuzzyMatchingAlgorithm .
+
+coda:hasNormalizationRules rdf:type owl:ObjectProperty ;
+    rdfs:domain coda:TextNormalizationStep ;
+    rdfs:range rdf:List .
+
+coda:hasMatchingStrategy rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:FuzzyMatchingAlgorithm ;
+    rdfs:range xsd:string .
+
+coda:hasMinimumConfidence rdf:type owl:DatatypeProperty ;
+    rdfs:domain coda:FuzzyMatchingAlgorithm ;
+    rdfs:range xsd:float .
+
+######################################################################
+# IMPLEMENTATION GUIDANCE
+######################################################################
+
+# Processing Logic Enhancement:
+# 1. Text Normalization: Convert input to lowercase, remove extra spaces
+# 2. Pattern Matching: Use both exact and fuzzy matching
+# 3. Priority-based Selection: Higher priority patterns take precedence
+# 4. Intent Classification: Map patterns to correct intents
+# 5. Measure Selection: Apply correct weighted formulas based on detected intent
+# 6. Rule Application: Apply contextual rules with highest priority first
+
+# Example Usage Patterns:
+# - "weighted maturity" → MaturityYieldWeightedMeasure
+# - "average maturity weighted" → MaturityYieldWeightedMeasure
+# - "market yield weighted" → MarketYieldWeightedMeasure
+# - "holding yield weighted" → HoldingYieldWeightedMeasure
+# - "weighted average maturity" → MaturityYieldWeightedMeasure
+
+######################################################################
+# DEBUGGING AIDS
+######################################################################
+
+# Debug rules for tracking pattern matching
+coda:WeightedPatternDebugRule rdf:type coda:ContextualRule ;
+    rdfs:label "Weighted Pattern Debug Rule" ;
+    rdfs:comment "Debug rule to track which patterns are being matched" ;
+    coda:hasDebugFlag true ;
+    coda:hasLoggingLevel "DETAILED" .
+
+# Test cases for validation
+coda:WeightedMaturityTestCase rdf:type coda:TestCase ;
+    coda:hasTestInput "Show me weighted maturity" ;
+    coda:hasExpectedIntent coda:MaturityYieldIntent ;
+    coda:hasExpectedMeasure coda:MaturityYieldWeightedMeasure ;
+    coda:hasExpectedFormula "TO_VARCHAR(ROUND(SUM(DAYS_BETWEEN(GLB_REPORT_DATE,GLB_MATURITY_DATE) * GLB_NOTIONAL_USD) / SUM(GLB_NOTIONAL_USD)/365,2)) AS AVG_MATURITY_YIELD" .
+
+coda:WeightedMarketYieldTestCase rdf:type coda:TestCase ;
+    coda:hasTestInput "Show me market yield weighted by notional" ;
+    coda:hasExpectedIntent coda:YieldIntent ;
+    coda:hasExpectedMeasure coda:MarketYieldWeightedMeasure ;
+    coda:hasExpectedFormula "TO_VARCHAR(SUM(GLB_NOTIONAL_USD * GLB_MARKET_YIELD) / SUM(GLB_NOTIONAL_USD)) AS AVG_MARKET_YIELD" .
+
+coda:WeightedHoldingYieldTestCase rdf:type coda:TestCase ;
+    coda:hasTestInput "Show me holding yield weighted by notional" ;
+    coda:hasExpectedIntent coda:YieldIntent ;
+    coda:hasExpectedMeasure coda:HoldingYieldWeightedMeasure ;
+    coda:hasExpectedFormula "TO_VARCHAR(SUM(GLB_NOTIONAL_USD * GLB_YIELD_IMPACT) / SUM(GLB_NOTIONAL_USD)) AS AVG_HOLDING_YIELD" .
+
+
+######################################################################
+# Notes for Implementation
+# - The filter uses the maximum date value from the data as the right boundary.
+# - For the left boundary, it subtracts N-1 months from the max date—so "2 periods" means "max month and one previous".
+# - Adjust <report_table> and <date_field> to match your schema at query-generation time.
+# - Parsing and instantiating the number N remains the responsibility of your intent extraction layer.
+######################################################################
+
+# ==============================================
+# IMPLEMENTATION NOTES
+# ==============================================
+# The enhanced system workflow for "across the months" requests:
+# 1. Parse user input for "across the months" and similar phrases
+# 2. Classify as DistributionIntent with MonthlyDistributionPattern  
+# 3. Apply R004_AcrossMonthsGrouping rule (highest priority)
+# 4. Generate SQL with GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE)
+# 5. Include appropriate SELECT clause with year, month dimensions
+# 6. Ensure no MAX date filtering to include all available months
+# 7. Apply ORDER BY for chronological result presentation

@@ -1,0 +1,761 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix finsight: <http://example.org/finsight#> .
+@prefix aika: <http://example.org/aika#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+# AIKA Ontology Definition
+aika:AIKAOntology rdf:type owl:Ontology ;
+    dc:title "AIKA Intent Analysis Ontology" ;
+    dc:description "Framework for adaptive intent knowledge assessment with enhanced integration, yield classification, and proper maturity handling" ;
+    owl:versionInfo "3.2.0" .
+
+# Core Analysis Components with Enhanced Integration
+aika:IntentAnalysis rdfs:subClassOf finsight:Analysis ;
+    rdfs:label "Intent Analysis" ;
+    rdfs:comment "AIKA-specific intent analysis process" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty finsight:hasInputFrom ;
+        owl:someValuesFrom finsight:CODAConnection
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty finsight:providesOutputTo ;
+        owl:someValuesFrom finsight:MIRRORConnection
+    ] .
+
+# Intent Components with Enhanced Metrics
+aika:Intent rdfs:subClassOf prov:Entity ;
+    rdfs:label "User Intent" ;
+    rdfs:comment "Identified user objective" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty finsight:hasConfidenceScore ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+# Financial Intent Specialization
+aika:FinancialIntent rdfs:subClassOf aika:Intent ;
+    rdfs:label "Financial Intent" ;
+    rdfs:comment "Intent related to financial concepts and analysis" .
+
+# Yield Intent Hierarchy
+aika:YieldIntent rdfs:subClassOf aika:FinancialIntent ;
+    rdfs:label "Yield Intent" ;
+    rdfs:comment "Intent related to yield calculations or information" .
+
+aika:HoldingYieldIntent rdfs:subClassOf aika:YieldIntent ;
+    rdfs:label "Holding Yield Intent" ;
+    rdfs:comment "Intent specifically about holding period yield or return" .
+
+aika:MarketYieldIntent rdfs:subClassOf aika:YieldIntent ;
+    rdfs:label "Market Yield Intent" ;
+    rdfs:comment "Intent specifically about market yield or current yield" .
+
+aika:GenericYieldIntent rdfs:subClassOf aika:YieldIntent ;
+    rdfs:label "Generic Yield Intent" ;
+    rdfs:comment "Ambiguous yield intent that requires classification" .
+
+# Rate Intent Hierarchy
+aika:RateIntent rdfs:subClassOf aika:FinancialIntent ;
+    rdfs:label "Rate Intent" ;
+    rdfs:comment "Intent related to rate calculations or information" .
+
+aika:HoldingRateIntent rdfs:subClassOf aika:RateIntent ;
+    rdfs:label "Holding Rate Intent" ;
+    rdfs:comment "Intent specifically about holding period rates" .
+
+aika:MarketRateIntent rdfs:subClassOf aika:RateIntent ;
+    rdfs:label "Market Rate Intent" ;
+    rdfs:comment "Intent specifically about market rates" .
+
+aika:GenericRateIntent rdfs:subClassOf aika:RateIntent ;
+    rdfs:label "Generic Rate Intent" ;
+    rdfs:comment "Ambiguous rate intent that requires classification" .
+
+# Maturity Intent Hierarchy - NEW
+aika:MaturityIntent rdfs:subClassOf aika:FinancialIntent ;
+    rdfs:label "Maturity Intent" ;
+    rdfs:comment "Intent related to maturity calculations or information - excludes holding qualifier insertion" .
+
+aika:WeightedAverageMaturityIntent rdfs:subClassOf aika:MaturityIntent ;
+    rdfs:label "Weighted Average Maturity Intent" ;
+    rdfs:comment "Intent specifically about weighted average maturity" .
+
+aika:DurationIntent rdfs:subClassOf aika:FinancialIntent ;
+    rdfs:label "Duration Intent" ;
+    rdfs:comment "Intent related to duration calculations - excludes holding qualifier insertion" .
+
+# Yield Classification System
+aika:YieldClassification rdfs:subClassOf finsight:Analysis ;
+    rdfs:label "Yield Classification" ;
+    rdfs:comment "Process to classify yield-related intents" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:classifiesYieldType ;
+        owl:someValuesFrom aika:YieldIntent
+    ] .
+
+# Query Rewriting Framework
+aika:QueryRewriting rdfs:subClassOf finsight:Analysis ;
+    rdfs:label "Query Rewriting" ;
+    rdfs:comment "Process to rewrite user queries based on intent classification" .
+
+aika:YieldQueryRewriting rdfs:subClassOf aika:QueryRewriting ;
+    rdfs:label "Yield Query Rewriting" ;
+    rdfs:comment "Specific rewriting for yield-related queries" .
+
+# Rate Classification System
+aika:RateClassification rdfs:subClassOf finsight:Analysis ;
+    rdfs:label "Rate Classification" ;
+    rdfs:comment "Process to classify rate-related intents" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:classifiesRateType ;
+        owl:someValuesFrom aika:RateIntent
+    ] .
+
+# Group By Intent
+aika:GroupByIntent rdfs:subClassOf aika:FinancialIntent ;
+    rdfs:label "Group By Intent" ;
+    rdfs:comment "Intent for data grouping, splitting, or 'for each' operations" .
+
+# Group By Query Rewriting
+aika:GroupByQueryRewriting rdfs:subClassOf aika:QueryRewriting ;
+    rdfs:label "Group By Query Rewriting" ;
+    rdfs:comment "Rewriting for group by related queries" .
+
+# Expertise Framework
+aika:ExpertiseLevel rdfs:subClassOf finsight:MetricBase ;
+    rdfs:label "Expertise Level" ;
+    rdfs:comment "Assessment of user expertise" .
+
+aika:Beginner rdfs:subClassOf aika:ExpertiseLevel .
+aika:Intermediate rdfs:subClassOf aika:ExpertiseLevel .
+aika:Expert rdfs:subClassOf aika:ExpertiseLevel .
+
+# Performance Metrics Using Shared Base
+aika:IntentAccuracy rdfs:subClassOf finsight:PerformanceMetric ;
+    rdfs:label "Intent Accuracy" ;
+    rdfs:comment "Accuracy of intent identification" .
+
+aika:IntentConfidence rdfs:subClassOf finsight:QualityMetric ;
+    rdfs:label "Intent Confidence" ;
+    rdfs:comment "Confidence in intent assessment" .
+
+# Yield Classification Metrics
+aika:YieldClassificationAccuracy rdfs:subClassOf finsight:PerformanceMetric ;
+    rdfs:label "Yield Classification Accuracy" ;
+    rdfs:comment "Accuracy of yield type classification" .
+
+# Rate Classification Metrics
+aika:RateClassificationAccuracy rdfs:subClassOf finsight:PerformanceMetric ;
+    rdfs:label "Rate Classification Accuracy" ;
+    rdfs:comment "Accuracy of rate type classification" .
+
+# Integration with FinSight
+aika:FinSightIntegration rdfs:subClassOf finsight:AIKAConnection ;
+    rdfs:label "FinSight Integration" ;
+    rdfs:comment "AIKA integration point with FinSight" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty finsight:hasIntegrationState ;
+        owl:someValuesFrom finsight:IntegrationState
+    ] .
+
+# AIKA-Specific Inference Rules
+aika:IntentInferenceRule rdfs:subClassOf finsight:InferenceRule ;
+    rdfs:label "Intent Inference Rule" ;
+    rdfs:comment "Rules for inferring user intent" .
+
+aika:ExpertiseInferenceRule rdfs:subClassOf finsight:InferenceRule ;
+    rdfs:label "Expertise Inference Rule" ;
+    rdfs:comment "Rules for determining expertise level" .
+
+# Maturity Detection Rules - HIGHEST PRIORITY
+aika:MaturityDetectionRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Maturity Detection Rule" ;
+    rdfs:comment "CRITICAL: Rule to detect maturity-related intents that should NOT get holding qualifiers" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "0"^^xsd:int
+    ] .
+
+# Yield-Specific Inference Rules
+aika:YieldDefaultRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Yield Default Rule" ;
+    rdfs:comment "Rule to default ambiguous yield intents to Holding Yield - high priority" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasDefaultYieldType ;
+        owl:hasValue aika:HoldingYieldIntent
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "1"^^xsd:int
+    ] .
+
+aika:HoldingYieldDetectionRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Holding Yield Detection Rule" ;
+    rdfs:comment "Rule to detect explicit holding yield mentions" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "2"^^xsd:int
+    ] .
+
+aika:MarketYieldDetectionRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Market Yield Detection Rule" ;
+    rdfs:comment "Rule to detect explicit market yield mentions - only when explicitly stated" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "3"^^xsd:int
+    ] .
+
+aika:GeographicContextRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Geographic Context Rule" ;
+    rdfs:comment "Rule to handle geographic references in yield queries" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "4"^^xsd:int
+    ] .
+
+# Rate-Specific Inference Rules
+aika:RateDefaultRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Rate Default Rule" ;
+    rdfs:comment "Rule to default ambiguous rate intents to Holding Rate - high priority" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasDefaultRateType ;
+        owl:hasValue aika:HoldingRateIntent
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "1"^^xsd:int
+    ] .
+
+aika:HoldingRateDetectionRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Holding Rate Detection Rule" ;
+    rdfs:comment "Rule to detect explicit holding rate mentions" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "2"^^xsd:int
+    ] .
+
+aika:MarketRateDetectionRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Market Rate Detection Rule" ;
+    rdfs:comment "Rule to detect explicit market rate mentions - only when explicitly stated" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:hasRulePriority ;
+        owl:hasValue "3"^^xsd:int
+    ] .
+
+# Enhanced Analysis Properties
+aika:analyzesIntent rdf:type owl:ObjectProperty ;
+    rdfs:domain aika:IntentAnalysis ;
+    rdfs:range aika:Intent ;
+    rdfs:subPropertyOf finsight:hasInputFrom .
+
+aika:determinesExpertise rdf:type owl:ObjectProperty ;
+    rdfs:domain aika:IntentAnalysis ;
+    rdfs:range aika:ExpertiseLevel ;
+    rdfs:subPropertyOf finsight:providesOutputTo .
+
+# Yield-Specific Properties
+aika:classifiesYieldType rdf:type owl:ObjectProperty ;
+    rdfs:label "classifies yield type" ;
+    rdfs:comment "Relates a classification process to the yield type being classified" ;
+    rdfs:domain aika:YieldClassification ;
+    rdfs:range aika:YieldIntent .
+
+aika:hasYieldContext rdf:type owl:ObjectProperty ;
+    rdfs:label "has yield context" ;
+    rdfs:comment "Links intent to contextual yield information" ;
+    rdfs:domain aika:YieldIntent ;
+    rdfs:range xsd:string .
+
+aika:hasDefaultYieldType rdf:type owl:ObjectProperty ;
+    rdfs:label "has default yield type" ;
+    rdfs:comment "Specifies the default yield type for ambiguous cases" ;
+    rdfs:domain aika:YieldDefaultRule ;
+    rdfs:range aika:YieldIntent .
+
+aika:containsYieldKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains yield keyword" ;
+    rdfs:comment "Indicates if input contains yield-related keywords" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:containsHoldingKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains holding keyword" ;
+    rdfs:comment "Indicates if input contains holding-specific keywords" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:containsMarketKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains market keyword" ;
+    rdfs:comment "Indicates if input contains market-specific keywords" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:hasRulePriority rdf:type owl:DatatypeProperty ;
+    rdfs:label "has rule priority" ;
+    rdfs:comment "Defines the priority order for rule execution (lower number = higher priority)" ;
+    rdfs:domain aika:IntentInferenceRule ;
+    rdfs:range xsd:int .
+
+aika:containsGeographicContext rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains geographic context" ;
+    rdfs:comment "Indicates if input contains geographic references" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:requiresExplicitMarketMention rdf:type owl:DatatypeProperty ;
+    rdfs:label "requires explicit market mention" ;
+    rdfs:comment "Flag indicating market yield requires explicit 'market' keyword" ;
+    rdfs:domain aika:MarketYieldDetectionRule ;
+    rdfs:range xsd:boolean .
+
+# Maturity-Specific Properties - NEW
+aika:containsMaturityKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains maturity keyword" ;
+    rdfs:comment "Indicates if input contains maturity-related keywords (maturity, duration, life, term)" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:excludesHoldingQualifier rdf:type owl:DatatypeProperty ;
+    rdfs:label "excludes holding qualifier" ;
+    rdfs:comment "Flag indicating this intent type should NOT receive holding qualifier insertion" ;
+    rdfs:domain aika:MaturityIntent ;
+    rdfs:range xsd:boolean .
+
+# Rate-Specific Properties
+aika:classifiesRateType rdf:type owl:ObjectProperty ;
+    rdfs:label "classifies rate type" ;
+    rdfs:comment "Relates a classification process to the rate type being classified" ;
+    rdfs:domain aika:RateClassification ;
+    rdfs:range aika:RateIntent .
+
+aika:hasRateContext rdf:type owl:ObjectProperty ;
+    rdfs:label "has rate context" ;
+    rdfs:comment "Links intent to contextual rate information" ;
+    rdfs:domain aika:RateIntent ;
+    rdfs:range xsd:string .
+
+aika:hasDefaultRateType rdf:type owl:ObjectProperty ;
+    rdfs:label "has default rate type" ;
+    rdfs:comment "Specifies the default rate type for ambiguous cases" ;
+    rdfs:domain aika:RateDefaultRule ;
+    rdfs:range aika:RateIntent .
+
+aika:containsRateKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains rate keyword" ;
+    rdfs:comment "Indicates if input contains rate-related keywords (rate, rates, average rates)" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:containsAverageKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains average keyword" ;
+    rdfs:comment "Indicates if input contains average-related keywords" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:classifiedRateType rdf:type owl:ObjectProperty ;
+    rdfs:label "classified rate type" ;
+    rdfs:comment "The determined rate type from classification" ;
+    rdfs:domain aika:RateClassificationResult ;
+    rdfs:range aika:RateIntent .
+
+# Group By Properties
+aika:containsGroupingKeyword rdf:type owl:DatatypeProperty ;
+    rdfs:label "contains grouping keyword" ;
+    rdfs:comment "Indicates if input contains split by, for each, or group by keywords" ;
+    rdfs:domain aika:Intent ;
+    rdfs:range xsd:boolean .
+
+aika:groupByQualifier rdf:type owl:DatatypeProperty ;
+    rdfs:label "group by qualifier" ;
+    rdfs:comment "Standard 'group by' text for rewriting" ;
+    rdfs:domain aika:GroupByQueryRewriting ;
+    rdfs:range xsd:string .
+
+# Query Rewriting Properties
+aika:originalQuery rdf:type owl:DatatypeProperty ;
+    rdfs:label "original query" ;
+    rdfs:comment "The original user query text" ;
+    rdfs:domain aika:QueryRewriting ;
+    rdfs:range xsd:string .
+
+aika:rewrittenQuery rdf:type owl:DatatypeProperty ;
+    rdfs:label "rewritten query" ;
+    rdfs:comment "The rewritten query text with intent clarification" ;
+    rdfs:domain aika:QueryRewriting ;
+    rdfs:range xsd:string .
+
+aika:insertionPoint rdf:type owl:DatatypeProperty ;
+    rdfs:label "insertion point" ;
+    rdfs:comment "Position in query where qualifier should be inserted" ;
+    rdfs:domain aika:QueryRewriting ;
+    rdfs:range xsd:string .
+
+aika:yieldQualifier rdf:type owl:DatatypeProperty ;
+    rdfs:label "yield qualifier" ;
+    rdfs:comment "Text to insert for yield disambiguation (e.g., 'holding')" ;
+    rdfs:domain aika:YieldQueryRewriting ;
+    rdfs:range xsd:string .
+
+aika:rateQualifier rdf:type owl:DatatypeProperty ;
+    rdfs:label "rate qualifier" ;
+    rdfs:comment "Text to insert for rate disambiguation (e.g., 'holding yield')" ;
+    rdfs:domain aika:RateQueryRewriting ;
+    rdfs:range xsd:string .
+
+# Temporal Framework Using Core Properties
+aika:AnalysisTimeline rdfs:subClassOf prov:InstantaneousEvent ;
+    rdfs:label "Analysis Timeline" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty prov:startedAtTime ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+# Explicit Data Flow Properties
+aika:receivesPromptData rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf finsight:hasInputFrom ;
+    rdfs:domain aika:IntentAnalysis ;
+    rdfs:range finsight:CODAConnection .
+
+aika:providesIntentData rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf finsight:providesOutputTo ;
+    rdfs:domain aika:IntentAnalysis ;
+    rdfs:range finsight:MIRRORConnection .
+
+# Enhanced Result Classes
+aika:IntentAnalysisResult rdfs:subClassOf finsight:AnalysisResult ;
+    rdfs:label "Intent Analysis Result" ;
+    rdfs:comment "Results from intent analysis process" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty finsight:hasQualityScore ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+# Yield-Specific Result Classes
+aika:YieldClassificationResult rdfs:subClassOf aika:IntentAnalysisResult ;
+    rdfs:label "Yield Classification Result" ;
+    rdfs:comment "Results from yield intent classification" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:classifiedYieldType ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+# Rate-Specific Result Classes
+aika:RateClassificationResult rdfs:subClassOf aika:IntentAnalysisResult ;
+    rdfs:label "Rate Classification Result" ;
+    rdfs:comment "Results from rate intent classification" ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty aika:classifiedRateType ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+aika:classifiedYieldType rdf:type owl:ObjectProperty ;
+    rdfs:label "classified yield type" ;
+    rdfs:comment "The determined yield type from classification" ;
+    rdfs:domain aika:YieldClassificationResult ;
+    rdfs:range aika:YieldIntent .
+
+# Validation Rules
+aika:IntentValidationRule rdfs:subClassOf finsight:InferenceRule ;
+    rdfs:label "Intent Validation Rule" ;
+    rdfs:comment "Rules for validating intent analysis" .
+
+# Yield Validation Rules
+aika:YieldValidationRule rdfs:subClassOf aika:IntentValidationRule ;
+    rdfs:label "Yield Validation Rule" ;
+    rdfs:comment "Rules for validating yield classification" .
+
+# Rate Validation Rules
+aika:RateValidationRule rdfs:subClassOf aika:IntentValidationRule ;
+    rdfs:label "Rate Validation Rule" ;
+    rdfs:comment "Rules for validating rate classification" .
+
+# Maturity Validation Rules - NEW
+aika:MaturityValidationRule rdfs:subClassOf aika:IntentValidationRule ;
+    rdfs:label "Maturity Validation Rule" ;
+    rdfs:comment "Validates that maturity-related queries do not receive holding qualifiers" .
+
+# TEXT PATTERN MATCHING FRAMEWORK
+aika:TextPatternRule rdfs:subClassOf aika:IntentInferenceRule ;
+    rdfs:label "Text Pattern Rule" ;
+    rdfs:comment "Rules based on text pattern matching for query rewriting" .
+
+aika:YieldPatternRule rdfs:subClassOf aika:TextPatternRule ;
+    rdfs:label "Yield Pattern Rule" ;
+    rdfs:comment "Pattern matching for yield-related text" .
+
+aika:RatePatternRule rdfs:subClassOf aika:TextPatternRule ;
+    rdfs:label "Rate Pattern Rule" ;
+    rdfs:comment "Pattern matching for rate-related text" .
+
+aika:MaturityPatternRule rdfs:subClassOf aika:TextPatternRule ;
+    rdfs:label "Maturity Pattern Rule" ;
+    rdfs:comment "Pattern matching for maturity-related text - EXCLUDES holding qualifier insertion" .
+
+# Pattern Properties
+aika:matchPattern rdf:type owl:DatatypeProperty ;
+    rdfs:label "match pattern" ;
+    rdfs:comment "Regular expression pattern to match in query text" ;
+    rdfs:domain aika:TextPatternRule ;
+    rdfs:range xsd:string .
+
+aika:replacementPattern rdf:type owl:DatatypeProperty ;
+    rdfs:label "replacement pattern" ;
+    rdfs:comment "Replacement text pattern with capture group references" ;
+    rdfs:domain aika:TextPatternRule ;
+    rdfs:range xsd:string .
+
+# =============================================================================
+# RULE IMPLEMENTATIONS - PRIORITY ORDERED (0 = HIGHEST PRIORITY)
+# =============================================================================
+
+# PRIORITY 0 - MATURITY EXCLUSION RULES (HIGHEST PRIORITY - PREVENTS HOLDING QUALIFIER)
+# =============================================================================
+
+# Rule 1: CRITICAL - Maturity Exclusion (runs before all other rules)
+aika:Rule_MaturityExclusion rdf:type aika:MaturityDetectionRule ;
+    rdfs:label "Maturity Exclusion Rule" ;
+    rdfs:comment "CRITICAL: If query contains maturity keywords, do NOT apply holding qualifiers (Priority 0)" ;
+    aika:hasRulePriority "0"^^xsd:int ;
+    aika:excludesHoldingQualifier "true"^^xsd:boolean .
+
+# Pattern 1: Weighted Average Maturity - NO MODIFICATION
+aika:Pattern_WeightedAverageMaturity rdf:type aika:MaturityPatternRule ;
+    rdfs:label "Weighted Average Maturity Pattern" ;
+    rdfs:comment "CRITICAL: Matches weighted average maturity - returns unchanged (Priority 0)" ;
+    aika:matchPattern "\\b(weighted\\s+average\\s+maturity)\\b" ;
+    aika:replacementPattern "$1" ;
+    aika:hasRulePriority "0"^^xsd:int .
+
+# Pattern 2: General Maturity Exclusion - NO MODIFICATION for any maturity terms
+aika:Pattern_MaturityExclusion rdf:type aika:MaturityPatternRule ;
+    rdfs:label "Maturity Exclusion Pattern" ;
+    rdfs:comment "CRITICAL: Excludes any weighted average query containing maturity/duration terms (Priority 0)" ;
+    aika:matchPattern "\\b(weighted\\s+average)\\b.*\\b(maturity|duration|life|term)\\b" ;
+    aika:replacementPattern "$1 $2" ;
+    aika:hasRulePriority "0"^^xsd:int .
+
+# Pattern 3: Duration Exclusion - NO MODIFICATION
+aika:Pattern_DurationExclusion rdf:type aika:MaturityPatternRule ;
+    rdfs:label "Duration Exclusion Pattern" ;
+    rdfs:comment "CRITICAL: Excludes duration-related weighted average queries (Priority 0)" ;
+    aika:matchPattern "\\b(weighted\\s+average\\s+duration)\\b" ;
+    aika:replacementPattern "$1" ;
+    aika:hasRulePriority "0"^^xsd:int .
+
+# PRIORITY 1 - DEFAULT RULES (HIGH PRIORITY - ADDS HOLDING QUALIFIERS)
+# =============================================================================
+
+# Rule 2: Yield Default Rule
+aika:Rule_YieldDefault rdf:type aika:YieldDefaultRule ;
+    rdfs:label "Default Yield to Holding Rule" ;
+    rdfs:comment "If yield mentioned without explicit 'market' keyword, default to Holding Yield (Priority 1)" ;
+    aika:hasRulePriority "1"^^xsd:int ;
+    aika:hasDefaultYieldType aika:HoldingYieldIntent .
+
+# Rule 3: Rate Default Rule
+aika:Rule_RateDefault rdf:type aika:RateDefaultRule ;
+    rdfs:label "Default Rate to Holding Rule" ;
+    rdfs:comment "If rate/rates mentioned without explicit 'market' keyword, default to Holding Rate (Priority 1)" ;
+    aika:hasRulePriority "1"^^xsd:int ;
+    aika:hasDefaultRateType aika:HoldingRateIntent ;
+    aika:rateQualifier "holding yield" .
+
+# Rule 4: Average Rates Default
+aika:Rule_AverageRatesDefault rdf:type aika:RateDefaultRule ;
+    rdfs:label "Average Rates Default Rule" ;
+    rdfs:comment "Average rates queries default to holding yield rates unless otherwise specified (Priority 1)" ;
+    aika:hasRulePriority "1"^^xsd:int ;
+    aika:hasDefaultRateType aika:HoldingRateIntent ;
+    aika:rateQualifier "holding yield" .
+
+# Rule 5: Group By Default
+aika:Rule_GroupByRewriting rdf:type aika:GroupByQueryRewriting ;
+    rdfs:label "Group By Rewrite Rule" ;
+    rdfs:comment "Convert split by/for each to group by (Priority 1)" ;
+    aika:hasRulePriority "1"^^xsd:int ;
+    aika:groupByQualifier "group by" .
+
+# ENHANCED PATTERN IMPLEMENTATIONS - PRIORITY 1 (with exclusion logic)
+# =============================================================================
+
+# Pattern 4: Enhanced Weighted Average Rates (excludes maturity)
+aika:Pattern_WeightedAverageRates_Enhanced rdf:type aika:RatePatternRule ;
+    rdfs:label "Enhanced Weighted Average Rates Pattern" ;
+    rdfs:comment "Matches 'weighted average rates' but EXCLUDES if maturity terms present - inserts 'holding yield' (Priority 1)" ;
+    aika:matchPattern "\\b(weighted)\\s+(average)\\s+(rates?)\\b(?!.*\\b(?:maturity|duration|life|term)\\b)" ;
+    aika:replacementPattern "$1 holding yield $2 $3" ;
+    aika:hasRulePriority "1"^^xsd:int .
+
+# Pattern 5: Enhanced Average Rates (excludes maturity)
+aika:Pattern_AverageRates_Enhanced rdf:type aika:RatePatternRule ;
+    rdfs:label "Enhanced Average Rates Pattern" ;
+    rdfs:comment "Matches 'average rates' but EXCLUDES if maturity terms present - inserts 'holding yield' (Priority 1)" ;
+    aika:matchPattern "\\b(average)\\s+(rates?)\\b(?!.*\\b(?:maturity|duration|life|term)\\b)" ;
+    aika:replacementPattern "$1 holding yield $2" ;
+    aika:hasRulePriority "1"^^xsd:int .
+
+# Pattern 6: Enhanced Generic Rates (excludes maturity)
+aika:Pattern_GenericRates_Enhanced rdf:type aika:RatePatternRule ;
+    rdfs:label "Enhanced Generic Rates Pattern" ;
+    rdfs:comment "Matches any 'rates' without modifiers but EXCLUDES if maturity terms present - inserts 'holding yield' (Priority 1)" ;
+    aika:matchPattern "\\b(?<!holding\\s|market\\s)(rates?)\\b(?!.*\\b(?:maturity|duration|life|term)\\b)" ;
+    aika:replacementPattern "holding yield $1" ;
+    aika:hasRulePriority "1"^^xsd:int .
+
+# Pattern 7: Enhanced Generic Yield (excludes maturity)
+aika:Pattern_GenericYield_Enhanced rdf:type aika:YieldPatternRule ;
+    rdfs:label "Enhanced Generic Yield Pattern" ;
+    rdfs:comment "Matches 'yield' without modifiers but EXCLUDES if maturity terms present - inserts 'holding' (Priority 1)" ;
+    aika:matchPattern "\\b(?<!holding\\s|market\\s)(yield)\\b(?!.*\\b(?:maturity|duration|life|term)\\b)" ;
+    aika:replacementPattern "holding $1" ;
+    aika:hasRulePriority "1"^^xsd:int .
+
+# Pattern 8: Group By Pattern
+aika:Pattern_SplitBy rdf:type aika:TextPatternRule ;
+    rdfs:label "Split By Pattern" ;
+    rdfs:comment "Convert split by/for each to group by (Priority 1)" ;
+    aika:matchPattern "\\b(split\\s+by|for\\s+each|for\\s+every)\\b" ;
+    aika:replacementPattern "group by" ;
+    aika:hasRulePriority "1"^^xsd:int .
+
+# PRIORITY 2 - EXPLICIT DETECTION RULES
+# =============================================================================
+
+# Rule 6: Explicit Holding Yield Detection
+aika:Rule_HoldingYieldExplicit rdf:type aika:HoldingYieldDetectionRule ;
+    rdfs:label "Explicit Holding Yield Rule" ;
+    rdfs:comment "If 'holding' and 'yield' mentioned together, classify as Holding Yield (Priority 2)" ;
+    aika:hasRulePriority "2"^^xsd:int .
+
+# Rule 7: Explicit Holding Rate Detection
+aika:Rule_HoldingRateExplicit rdf:type aika:HoldingRateDetectionRule ;
+    rdfs:label "Explicit Holding Rate Rule" ;
+    rdfs:comment "If 'holding' and 'rate' mentioned together, classify as Holding Rate (Priority 2)" ;
+    aika:hasRulePriority "2"^^xsd:int ;
+    aika:rateQualifier "holding yield" .
+
+# PRIORITY 3 - EXPLICIT MARKET DETECTION (LOW PRIORITY - ONLY WHEN EXPLICIT)
+# =============================================================================
+
+# Rule 8: Explicit Market Yield Detection
+aika:Rule_MarketYieldExplicit rdf:type aika:MarketYieldDetectionRule ;
+    rdfs:label "Explicit Market Yield Rule" ;
+    rdfs:comment "ONLY if 'market' and 'yield' explicitly mentioned together, classify as Market Yield (Priority 3)" ;
+    aika:hasRulePriority "3"^^xsd:int ;
+    aika:requiresExplicitMarketMention "true"^^xsd:boolean .
+
+# Rule 9: Explicit Market Rate Detection
+aika:Rule_MarketRateExplicit rdf:type aika:MarketRateDetectionRule ;
+    rdfs:label "Explicit Market Rate Rule" ;
+    rdfs:comment "ONLY if 'market' and 'rate' explicitly mentioned together, classify as Market Rate (Priority 3)" ;
+    aika:hasRulePriority "3"^^xsd:int ;
+    aika:rateQualifier "market yield" .
+
+# PRIORITY 4 - GEOGRAPHIC CONTEXT (LOWEST PRIORITY)
+# =============================================================================
+
+# Rule 10: Geographic Context Default
+aika:Rule_GeographicYieldDefault rdf:type aika:GeographicContextRule ;
+    rdfs:label "Geographic Yield Default Rule" ;
+    rdfs:comment "Geographic references alone do not imply market yield - default to holding yield (Priority 4)" ;
+    aika:hasRulePriority "4"^^xsd:int ;
+    aika:hasDefaultYieldType aika:HoldingYieldIntent .
+
+# QUERY REWRITING RULES
+# =============================================================================
+
+# Rule 11: Yield Query Rewriting
+aika:Rule_YieldRewriting rdf:type aika:YieldQueryRewriting ;
+    rdfs:label "Yield Query Rewrite Rule" ;
+    rdfs:comment "Insert 'holding' before 'yield' when yield type is ambiguous" ;
+    aika:yieldQualifier "holding" ;
+    aika:insertionPoint "before_yield" .
+
+# Rule 12: Rate Query Rewriting
+aika:Rule_RateRewriting rdf:type aika:RateQueryRewriting ;
+    rdfs:label "Rate Query Rewrite Rule" ;
+    rdfs:comment "Insert 'holding yield' before 'rate/rates' when rate type is ambiguous" ;
+    aika:rateQualifier "holding yield" ;
+    aika:insertionPoint "before_rate" .
+
+# Rule 13: Weighted Average Rate Rewriting
+aika:Rule_WeightedAverageRateRewriting rdf:type aika:RateQueryRewriting ;
+    rdfs:label "Weighted Average Rate Rewrite Rule" ;
+    rdfs:comment "Insert 'holding yield' in weighted average rate queries" ;
+    aika:rateQualifier "holding yield" ;
+    aika:insertionPoint "after_weighted" .
+
+# =============================================================================
+# COMPREHENSIVE RULE PRIORITY SUMMARY AND IMPLEMENTATION LOGIC
+# =============================================================================
+
+# PRIORITY EXECUTION ORDER:
+# Priority 0: MATURITY EXCLUSION (prevents holding qualifier insertion)
+#   - Pattern_WeightedAverageMaturity: "weighted average maturity" → "weighted average maturity" (no change)
+#   - Pattern_MaturityExclusion: any "weighted average" + maturity terms → no change
+#   - Pattern_DurationExclusion: "weighted average duration" → "weighted average duration" (no change)
+
+# Priority 1: DEFAULT RULES (adds holding qualifiers if not excluded by Priority 0)
+#   - Pattern_WeightedAverageRates_Enhanced: "weighted average rates" → "weighted holding yield average rates" (if no maturity terms)
+#   - Pattern_AverageRates_Enhanced: "average rates" → "average holding yield rates" (if no maturity terms)
+#   - Pattern_GenericRates_Enhanced: "rates" → "holding yield rates" (if no maturity terms)
+#   - Pattern_GenericYield_Enhanced: "yield" → "holding yield" (if no maturity terms)
+#   - Pattern_SplitBy: "split by/for each" → "group by"
+
+# Priority 2: EXPLICIT HOLDING DETECTION
+#   - Detects when "holding" is already explicitly mentioned
+
+# Priority 3: EXPLICIT MARKET DETECTION (only when "market" keyword present)
+#   - Only triggers if "market" is explicitly stated
+
+# Priority 4: GEOGRAPHIC CONTEXT
+#   - Geographic references default to holding yield (not market yield)
+
+# IMPLEMENTATION ALGORITHM:
+# 1. Check Priority 0 patterns first - if match, return unchanged (exclude from holding qualifier insertion)
+# 2. If no Priority 0 match, proceed to Priority 1 patterns - apply holding qualifier insertion
+# 3. Continue with lower priority rules only if higher priority rules don't match
+
+# KEY BEHAVIORAL CHANGES:
+# BEFORE FIX:
+# - "weighted average yield" → "weighted holding yield average yield" ✓
+# - "weighted average maturity" → "weighted holding yield average maturity" ✗ (WRONG)
+
+# AFTER FIX:
+# - "weighted average yield" → "weighted holding yield average yield" ✓ (unchanged)
+# - "weighted average maturity" → "weighted average maturity" ✓ (FIXED - no modification)
+
+# EXAMPLES OF EXPECTED BEHAVIOR:
+# Input: "weighted average yield" → Output: "weighted holding yield average yield"
+# Input: "weighted average rates" → Output: "weighted holding yield average rates"  
+# Input: "weighted average maturity" → Output: "weighted average maturity" (NO CHANGE)
+# Input: "weighted average duration" → Output: "weighted average duration" (NO CHANGE)
+# Input: "average rates" → Output: "average holding yield rates"
+# Input: "split by sector" → Output: "group by sector"
+
+# =============================================================================
+# END OF COMPLETE AIKA ONTOLOGY WITH MATURITY HANDLING FIX
+# =============================================================================

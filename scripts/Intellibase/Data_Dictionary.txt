@@ -1,0 +1,207 @@
+{
+  "metadata": {
+    "description": "Data Dictionary with unique values from source data",
+    "total_columns": 32,
+    "generated_timestamp": "2025-06-18T10:52:36.789239",
+    "columns": [
+      "COLUMN",
+      "DESCRIPTION",
+      "LONG DESCRIPTION",
+      "UNIQUE_VALUES"
+    ]
+  },
+  "dictionary_data": [
+    {
+      "COLUMN": "GLB_ASSET_CLASS_2",
+      "DESCRIPTION": "Asset class, security's product type",
+      "LONG DESCRIPTION": "- Asset class: A category of investments that share similar traits and perform in similar ways, like stocks or bonds.\n- Asset-Backed Securities (ABS): Securities supported by A group of underlying assets, like mortgages, car loans, or credit card debts.\n- Bank Senior Paper: Bank sector Debt that takes priority over other unsecured or subordinated debt in case of bankruptcy or liquidation, usually offering lower interest rates because of the reduced risk.\n- Corporate Bonds:  Corporate securities with no fixed maturity date, often paying a fixed coupon indefinitely unless called by the issuer.\n- Covered bonds:  securities backed by a group of assets, usually mortgages. This provides extra protection for bondholders if the issuer fails to pay.\n -Government Bonds (FCY):  securities issued by governments, typically used to finance government spending or infrastructure projects.\n- Short Term Bank Paper:  Certificates of Deposit (CD) and Commercial Paper (CP) are short-term debt instruments issued by banks and corporations, respectively, to raise funds.\n -Supra / Quasi / Agency: Supranationals - International organizations such as the World Bank or International Monetary Fund (IMF) that issue debt securities to fund development projects or provide financial assistance to member countries, Agencies / Quasi Govt:  Securities issued by government-sponsored enterprises or quasi-governmental organizations, often considered to have implicit government backing.\n- Treasury Bills & Central Bank CD:  Short-term debt instruments issued by governments or central banks, typically with maturities ranging from a few days to one year, used to finance government operations or manage liquidity in the banking system.",
+      "UNIQUE_VALUES": "Other, Asset Backed Securities, Corporate Bonds, Bank Senior Paper, Supra / Quasi / Agency, Short Term Bank Paper, Treasury Bills & Central Bank CD, Covered Bonds, Government Bonds, 0x2a"
+    },
+    {
+      "COLUMN": "GLB_COUPON_TYPE",
+      "DESCRIPTION": "Coupon types are grouped under two major categories in a dataset: float (FLOATING, FLOATING ABS) and fixed (FIXED, FIXED ABS, PAY-IN-KIND, STEP CPN, VARIABLE, ZERO COUPON) ",
+      "LONG DESCRIPTION": "If the following word is used in prompt: float - then filter for FLOATING, FLOATING ABS in GLB_COUPON_TYPE column.\nIf the following word is used in prompt: fixed - then filter for all the other coupon types different than FLOATING and FLOATING ABS.\nIf the words from column GLB_COUPON_TYPE are used in prompt with upper case then filter for their exact values in GLB_COUPON_TYPE column.\n\nIn finance, a coupon is the interest payment received by a security's owner from the issue date until the maturity date of a security. There are several secuties' categories from a coupon type perspective – fixed and floating rate securities and there is a special type of fixed-rate security, a zero-coupon bond.\nUnlike a fixed-rate security, in a floating rate security, the next coupon can be higher or lower than the previous coupon.\nTreat FLOATING and FLOATING ABS as floating, other coupon types as fixed.",
+      "UNIQUE_VALUES": "FIXED, FLOATING, FLOATING ABS, VARIABLE, ZERO COUPON, PAY-IN-KIND, STEP CPN"
+    },
+    {
+      "COLUMN": "GLB_CUSIP",
+      "DESCRIPTION": "cusip, security ID",
+      "LONG DESCRIPTION": "A CUSIP (Committee on Uniform Securities Identification Procedures) is a nine-character numeric or alphanumeric code that uniquely identifies a financial security for the purposes of facilitating clearing and settlement of trades. All CUSIP identifiers are fungible, which means that a unique CUSIP identifier for each individual security stays the same, regardless of the exchange where the shares were purchased or the venue on which the shares were traded.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_INSTRUMENT",
+      "DESCRIPTION": "instrument description, bloomberg ticker",
+      "LONG DESCRIPTION": "In finance, a ticker symbol is a unique set of letters that identifies a specific stock or financial instrument. It is shown on the stock exchange's ticker tape, which displays real-time price changes of stocks as they are traded.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_ISIN",
+      "DESCRIPTION": "ISIN, security ID",
+      "LONG DESCRIPTION": "An International Securities Identification Number (ISIN) is a 12-character alphanumeric code that uniquely identifies a security worldwide. It helps in clearing, reporting, and settling trades. The structure of the ISIN code is defined in ISO 6166 and ensures consistent identification of a security by standardizing the assigned National Number during trading and settlement.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_FINAL_CCY",
+      "DESCRIPTION": "Currency, CCY",
+      "LONG DESCRIPTION": "The currency of the security",
+      "UNIQUE_VALUES": "USD, EUR, GBP, HKD, SGD, KRW, JPY, CNY, AUD, CNH, MYR, BWP, AED, UGX, TWD, INR, THB, IDR, OMR, PHP, BHD, XAF, QAR, XOF, ZAR, BDT, VND, LKR, GHS, PKR, CAD, NPR, MOP, NGN, GMD, ZMW, KES, BND, IQD"
+    },
+    {
+      "COLUMN": "GLB_FINAL_COUNTRY_NAME",
+      "DESCRIPTION": "Country, Booking Country",
+      "LONG DESCRIPTION": "The country where the security transaction is booked or recorded in the financial records. For example: Taiwan (TW), Hong Kong (HK), United Kingdom (UK or GB), United States of America (US or USA), United Arab Emirates (AE or UAE).",
+      "UNIQUE_VALUES": "UNITED STATES OF AMERICA, UNITED KINGDOM, GERMANY, HONG KONG, SINGAPORE, CHINA, AUSTRALIA, UNITED ARAB EMIRATES, MALAYSIA, UGANDA, TAIWAN, JAPAN, INDIA, THAILAND, INDONESIA, OMAN, PHILIPPINES, BAHRAIN, CAMEROON, BOTSWANA, QATAR, COTE D'IVOIRE, SOUTH AFRICA, BANGLADESH, GHANA, VIETNAM, SRI LANKA, PAKISTAN, MAURITIUS, EGYPT, NIGERIA, NEPAL, MACAO, BRUNEI DARUSSALAM, GAMBIA, ZAMBIA, KENYA, IRAQ"
+    },
+    {
+      "COLUMN": "GLB_FV_HTC",
+      "DESCRIPTION": "FVOCI (fair value), HTC (amortizing) - accounting treatment type",
+      "LONG DESCRIPTION": "Accounting Treatment Types:\n\nFVOCI (Fair Value Through Other Comprehensive Income):\nFair value through other comprehensive income (FVOCI) is an accounting treatment used for certain financial assets. Under FVOCI, the assets are initially recorded at fair value, and changes in fair value are recognized in other comprehensive income (OCI) rather than in the income statement.\n\nHTC (Held-to-Collect):\nHeld-to-collect (HTC) is an accounting treatment for financial assets that are intended to be held until maturity. These positions are recorded at amortized cost, and their market value is not shown in the financial statements.",
+      "UNIQUE_VALUES": "Issuance, FV, HTC, Other - CFH, SH - Swaps"
+    },
+    {
+      "COLUMN": "GLB_GLOBAL_REGION",
+      "DESCRIPTION": "Region",
+      "LONG DESCRIPTION": "Geographical region of trades booking country.",
+      "UNIQUE_VALUES": "Americas, Europe, GCNA, ASEAN, MENAP, Africa, South Asia"
+    },
+    {
+      "COLUMN": "GLB_HIGH_LVL_STRATEGY",
+      "DESCRIPTION": "Strategy - purpose of portfolio",
+      "LONG DESCRIPTION": "It's a purpose of the portfolio. Portfolio strategies: Structural Hedging, Other, MREL, Regulatory, Fair Value",
+      "UNIQUE_VALUES": "Issuance, Fair Value, MREL, Structural Hedging, Regulatory, Other - CFH"
+    },
+    {
+      "COLUMN": "GLB_HQLA",
+      "DESCRIPTION": "HQLA, High Quality Liquid Assets",
+      "LONG DESCRIPTION": "High Quality Liquid Assets (HQLA) refer to assets that are easily and quickly convertible into cash, such as government bonds and highly-rated corporate debt. HQLA are considered safe and liquid and are used by financial institutions to meet short-term funding needs and regulatory requirements. They are split into - '1 / 2A / 2B / Non HQLA' with 1 being most liquid",
+      "UNIQUE_VALUES": "Non HQLA, 1, 2B, 2A"
+    },
+    {
+      "COLUMN": "GLB_INDEX_NAME",
+      "DESCRIPTION": "Reference index name, benchmark for floating bonds",
+      "LONG DESCRIPTION": "A benchmark (index) curve is a reference interest rate curve used to price fixed-income securities. It serves as a standard against which the performance of other securities can be measured.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_ISSUE_RATING_SP",
+      "DESCRIPTION": "S&P Rating",
+      "LONG DESCRIPTION": "Issue rating given by Standard and poor's rating agency. This rating assesses the credit quality of a specific debt security or bond issued by the entity. It focuses on the likelihood that the issuer will default on that particular debt obligation. Issue ratings consider factors such as the terms of the bond, its priority in the issuer's capital structure, and any collateral backing the bond.\n1. AAA: Extremely strong capacity to meet financial commitments\n2. AA: Very strong capacity to meet financial commitments\n3. A: Strong capacity to meet financial commitments\n4. BBB: Adequate capacity to meet financial commitments, but more subject to adverse economic conditions\n5. BB: Less vulnerable in the near term but faces major ongoing uncertainties\n6. B: More vulnerable to adverse business, financial, and economic conditions but currently has the capacity to meet financial commitments\n7. CCC: Currently vulnerable and dependent on favorable business, financial, and economic conditions to meet financial commitments\n8. CC: Currently highly vulnerable\n9. C: Currently highly vulnerable, typically in default\n10. D: Payment default on financial commitments\nSimilar to other rating agencies, S&P may also use modifiers such as \"+\" or \"-\" to further indicate relative credit risk within each rating category.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_ISSUER_NAME",
+      "DESCRIPTION": "Name of the security's issuer",
+      "LONG DESCRIPTION": "Issuer name it's the name of the issuer of the security.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_LAST_RESET_DATE",
+      "DESCRIPTION": "Last index reset date for floating bonds",
+      "LONG DESCRIPTION": "It is the date when the underlying benchmark (index) for securities with floating coupon was reset last time.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_MAP_PORTFOLIO",
+      "DESCRIPTION": "Portfolio, portfolio name",
+      "LONG DESCRIPTION": "The portfolio that includes a particular security.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_MATURITY_DATE",
+      "DESCRIPTION": "Maturity Date, Expiry Date",
+      "LONG DESCRIPTION": "The maturity date of a security is the scheduled date when it is set to mature, considering any changes made to the original date. The adjusted maturity date can differ from the original maturity date for various reasons. For instance, if the issuer has the right to redeem (or \"call\") the security before its maturity date, the adjusted maturity date will be the earlier of the call date or the original maturity date.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_PRODUCT_SUBTYPE",
+      "DESCRIPTION": "BOND, ISSUANCE. Issuance it's a category different than Bond.",
+      "LONG DESCRIPTION": "If the following words are used in the prompt: bond, bonds then filter for BOND in GLB_PRODUCT_SUBTYPE column.\nIf the following words are used in the prompt: issued, issuance, issuances then filter for ISSUANCE in GLB_PRODUCT_SUBTYPE column.\n\nGLB_PRODUCT_SUBTYPE provide an information if the position (ISIN,CUSIP) is a bond or an issuance: Bond it's a security that the bank buys from the market, while issuance it's a security that the bank issues itself.",
+      "UNIQUE_VALUES": "ISSUANCE, IRS, BOND, CCS, CDS, SWAP DEAD"
+    },
+    {
+      "COLUMN": "GLB_REPORT_DATE",
+      "DESCRIPTION": "Report Date, As of Date, CoB Date, month end, end of month, ME, period",
+      "LONG DESCRIPTION": "COB stands for \"close of business,\" meaning the end of the business day. It's commonly used to set deadlines for completing financial transactions or submitting financial information. The last day of each month can also be called \"month end,\" \"end of month\", \"period\" or \"ME.\" For example, \"ME April\" means the last day of April. If no report date is provided in a prompt then assume the most recent report date (CoB).",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_SOLO_SUB",
+      "DESCRIPTION": "SOLO, SUB",
+      "LONG DESCRIPTION": "The category of the entity issuing the security can be classified as either \"Solo\" or \"Subsidiary.\" A \"Solo\" entity issues securities independently, while a \"Subsidiary\" entity issues securities as part of a larger parent organization.",
+      "UNIQUE_VALUES": "SOLO, SUB"
+    },
+    {
+      "COLUMN": "GLB_ASW_DM",
+      "DESCRIPTION": "ASW for fixed coupon securities, DM (Discount Margin) for floating coupon securities",
+      "LONG DESCRIPTION": "ASW/DM - the term Asset Swap Spread (ASW) and Discount margin (DM) refers to the difference between a security's Holding Yield and the relevant risk-free Swap Rate. This difference indicates the credit risk reflected in the security's yield. It is determined by the security's price and coupon at the time of purchase.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_BOOK_PRICE",
+      "DESCRIPTION": "Book Price calculated from Book Value",
+      "LONG DESCRIPTION": "The book value price of a security, also known as the carrying value, is the value at which the security is recorded on the issuer's balance sheet. This value reflects any amortization of the security's premium or discount, as well as any adjustments made to the security's original cost over time. This accounting treatment ensures that the security's value on the balance sheet represents its true economic value, considering the passage of time and changes in interest rates.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_BOOK_VALUE_USD",
+      "DESCRIPTION": "Book value in USD",
+      "LONG DESCRIPTION": "The book value of a security is its value on the issuer's balance sheet. It is usually the original cost minus any reductions due to amortization.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_CR_DELTA_TOTAL",
+      "DESCRIPTION": "CR Delta, CR01 in USD",
+      "LONG DESCRIPTION": "CR01 (CR Delta) it's a measure of how sensitive a bond's price is to changes in credit spreads. It shows the change in the bond's present value for a 0.01% change in the spread. It's expressed in USD",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_IR_PV01_TOTAL",
+      "DESCRIPTION": "PV01 in USD",
+      "LONG DESCRIPTION": "PV01 it's a measure of how sensitive a bond's price is to changes in interest rates. It is usually expressed as the change in the bond's present value for a 0.01% change in yield. It's expressed in USD",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_MARKET_PRICE",
+      "DESCRIPTION": "Market Price calculated from Market Value",
+      "LONG DESCRIPTION": "Market Price is the current price at which a security is trading in the financial markets. It is determined by the supply and demand dynamics.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_MARKET_VALUE_USD",
+      "DESCRIPTION": "Market Value in USD",
+      "LONG DESCRIPTION": "Market Value in USD is the current value of a security based on prevailing market conditions. This value may differ from the bond's face value or book value. It's expressed in USD.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_MARKET_YIELD",
+      "DESCRIPTION": "Market yield at report date (market date)",
+      "LONG DESCRIPTION": "Market Yield is the yield of a security calculated based on its market price, coupon, and maturity.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_MTM_USD",
+      "DESCRIPTION": "Mark-to-Market value in USD",
+      "LONG DESCRIPTION": "Mark-to-Market (MTM) is the process of updating the recorded value of a security to match its current market value. This involves noting any potential gains or losses that haven't been realized yet as the security's value changes over time. This value is shown in USD currency.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_NOTIONAL_USD",
+      "DESCRIPTION": "Notional in USD",
+      "LONG DESCRIPTION": "Notional in USD is the principal amount or face value of a security. It is used to calculate interest and determine the repayment amount when the security matures.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_RWA",
+      "DESCRIPTION": "Risk-Weighted Assets in USD ",
+      "LONG DESCRIPTION": "Risk-Weighted Assets (RWA) is a measure used by financial institutions to calculate the amount of capital they need to hold to cover the risks associated with their assets. This value is shown in USD currency.",
+      "UNIQUE_VALUES": "None"
+    },
+    {
+      "COLUMN": "GLB_YIELD_IMPACT",
+      "DESCRIPTION": "Holding Yield (purchased yield) at trade date",
+      "LONG DESCRIPTION": "Holding Yield (or purchased yield) at the trade date is the yield of a security calculated based on its book price, coupon, and maturity. This yield represents the annual interest rate paid by the security, which includes both the coupon payments and the price difference between the purchase price and the value at maturity (usually equal to 100).",
+      "UNIQUE_VALUES": "None"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+Standard Table for Treasury Use Case:
+- STRICTLY do not consider "Intellibase" as a Value. 
+- Among the columns, BIGINT , DECIMAL datatype columns are Measures, while all other columns are dimensions.
+- If user text has Date, then Extract the Month and year information from the same and assign the month to MONTH(GLB_REPORT_DATE) and year to YEAR(GLB_REPORT_DATE). 
+- If user text has YEAR, then Extract the year information and assign the year to YEAR(GLB_REPORT_DATE). 
+- To start, take the user's input and pick out the important values, then sort them into different dimensions.
+- If user specifies count, Provide the count. 
+- GLB_FINAL_COUNTRY_NAME: The country where the bond transaction is booked or recorded in the financial records. Taiwan can be referred as TW, Hong Kong as HK, United Kingdom as UK or GB, United States of America as US or USA, United Arab Emirates as AE or UAE. Any Country, Booking Country NAMES will be available in this column. Ex:UNITED KINGDOM,HONG KONG,SINGAPORE,UNITED ARAB EMIRATES,UNITED STATES OF AMERICA	CHINA,TAIWAN,INDIA. STRICTLY TAKE THE RESPECTIVE COUNTRY NAMES for FILTER even IF the user specifies the COUNTRY CODE. 
+- STRICTLY For each specified month, select maximum date available for that Year and month. Use max(GLB_REPORT_DATE) for each month/year dynamically. Do NOT assume last day of month."
+- If they provide a country name, go with GLB_FINAL_COUNTRY_NAME. Make sure to verify the values by performing a fuzzy match and pull the correct name from the "GLB_FINAL_COUNTRY_NAME" column.
+
+STRICTLY STRICTLY When User ask you to group data and provide counts, I want you to:
+1. Group the data by the specified category/categories
+2. For each group, count the number of distinct records/rows (NOT sum the values)
+3. Return the results as a table showing each group and its count
+
+The table includes the following columns:
+TABLE_SCHEMA = {
+    GLB_ASSET_CLASS_2: VARCHAR(100),
+    GLB_COUPON_TYPE: VARCHAR(100),
+    GLB_CUSIP: VARCHAR(100),
+    GLB_INSTRUMENT: VARCHAR(100),
+    GLB_ISIN: VARCHAR(100),
+    GLB_FINAL_CCY: VARCHAR(100),
+    GLB_FINAL_COUNTRY_NAME: VARCHAR(100),
+    GLB_FV_HTC: VARCHAR(100),
+    GLB_GLOBAL_REGION: VARCHAR(100),
+    GLB_HIGH_LVL_STRATEGY: VARCHAR(100),
+    GLB_HQLA: VARCHAR(100),
+    GLB_INDEX_NAME: VARCHAR(100),
+    GLB_ISSUE_RATING_SP: VARCHAR(100),
+    GLB_ISSUER_NAME: VARCHAR(100),
+    GLB_MAP_PORTFOLIO: VARCHAR(100),
+    GLB_SOLO_SUB: VARCHAR(100),
+    GLB_PRODUCT_SUBTYPE: VARCHAR(100),
+    
+    # Date columns
+    GLB_LAST_RESET_DATE: Date,
+    GLB_MATURITY_DATE: Date,
+    GLB_REPORT_DATE: Date,
+    
+    # Numeric columns
+    GLB_ASW_DM: DECIMAL(38,2),
+    GLB_BOOK_PRICE: DECIMAL(38,2),
+    GLB_BOOK_VALUE_USD: DECIMAL(38,2),
+    GLB_CR_DELTA_TOTAL: DECIMAL(38,2),
+    GLB_IR_PV01_TOTAL: DECIMAL(38,2),
+    GLB_MARKET_PRICE: DECIMAL(38,2),
+    GLB_MARKET_VALUE_USD: DECIMAL(38,2),
+    GLB_MARKET_YIELD: DECIMAL(38,2),
+    GLB_MTM_USD: DECIMAL(38,2),
+    GLB_NOTIONAL_USD: DECIMAL(38,2),
+    GLB_RWA: DECIMAL(38,2),
+    GLB_YIELD_IMPACT: DECIMAL(38,2)
+}

@@ -1,0 +1,246 @@
+{
+  "SQL_QUERY_GENERATOR_RULES": {
+    "CRITICAL_INSTRUCTION": "YOU MUST CHECK AND APPLY EVERY SINGLE RULE BELOW. DO NOT SKIP ANY RULE. EACH RULE IS MANDATORY.",
+    
+    "TARGET_TABLE": {
+      "schema": "TREASURY_AI",
+      "view": "TREASURY_AI_INTELLIBASE_VIEW"
+    },
+    "OUTPUT_REQUIREMENT": {
+      "RULE_ID": "R001",
+      "RULE": "MANDATORY: Provide ONLY the SQL query as output.DONOT REPLACE THE VIEW WITH ITS DEFINITION. NO explanations, NO additional text, NO comments. ALWAYS ADD THIS CONDITION TO GENERATED SQL QUERY. STRICTLY STRICTLY BRING IN \"GLB_FINAL_COUNTRY_NAME\" FOR ROW LEVEL SECURITY Use. If the BASE QUERY already has a WHERE Clause, combine using AND ELSE USE WHERE Clause.",
+      "SECURITY_FILTER": "EXISTS (SELECT 1 FROM "4TL_DAC_TREASURY_GENAI" d WHERE d."UserID" = '{user_id}' AND d."Criterion" = 'COUNTRY_CD' AND d."Scenario" = 'INTELLIBASE_MI'   AND (d."Operator" = 'ALL' OR (d."Operator" = 'EQ' AND d."FirstValue" = f.GLB_MSTR_COUNTRY) OR (d."Operator" = 'NE' AND d."FirstValue" != f.GLB_MSTR_COUNTRY)))",
+      "NON_NEGOTIABLE": "This SECURITY FILTER is NON-NEGOTIABLE and MUST BE PRESENT IN EVERY QUERY."
+    },
+    
+    "COLUMN_CLASSIFICATION": {
+      "RULE_ID": "R002", 
+      "RULE": "MANDATORY: BIGINT and DECIMAL datatype columns are Measures. All other columns are Dimensions."
+    },
+    
+    "DATE_HANDLING_RULES": [
+      {
+        "RULE_ID": "R003",
+        "RULE": "MANDATORY: If user text has Date, extract Month and Year. Assign month to MONTH(GLB_REPORT_DATE) and year to YEAR(GLB_REPORT_DATE)."
+      },
+      {
+        "RULE_ID": "R004",
+        "RULE": "MANDATORY: If user text has Year, include that as a filter."
+      },
+      {
+        "RULE_ID": "R005", 
+        "RULE": "STRICTLY MANDATORY: If user prompt does NOT request any dates or inquire about recent dates, default to latest dates using MAX(GLB_REPORT_DATE)."
+      },
+      {
+        "RULE_ID": "R006",
+        "RULE": "STRICTLY STRICTLY MANDATORY: For each specified month, select maximum date available for that Year and month. Use max(GLB_REPORT_DATE) for each month/year dynamically. Do NOT assume last day of month."
+      },
+      {
+        "RULE_ID": "R007",
+        "RULE": "STRICTLY MANDATORY: If user provides start date but NO end date for calculating yields/percentage changes, use MAX(REPORTDATE) as end date."
+      },
+      {
+        "RULE_ID": "R007_1",
+        "RULE": "If user mentions: \"group by period/dates\", \"within each period\", \"by time\", \"aggregate by month/quarter/year\" or similar temporal grouping: DO NOT apply default date filters (start/end dates). GROUP BY YEAR(GLB_REPORT_DATE), MONTH(GLB_REPORT_DATE). Include all available dates in dataset"
+      }
+    ],
+    
+    "AGGREGATION_RULES": [
+      {
+        "RULE_ID": "R008",
+        "RULE": "MANDATORY: Include appropriate aggregate functions (SUM, AVG, COUNT) and GROUP BY clauses where necessary."
+      },
+      {
+        "RULE_ID": "R009",
+        "RULE": "STRICTLY MANDATORY: If user requests COUNT, provide COUNT. If user requests SUM, provide SUM."
+      }
+    ],
+    
+    "COLUMN_HANDLING_RULES": [
+      {
+        "RULE_ID": "R010",
+        "RULE": "MANDATORY: Use column names exactly as they appear in dataset."
+      },
+      {
+        "RULE_ID": "R011", 
+        "RULE": "MANDATORY: For country names, use GLB_FINAL_COUNTRY_NAME column.". If Country name is "UNITED ARAB EMIRATES" Then replace with ("DUBAI" and "DIFC"). 
+      },
+      {
+        "RULE_ID": "R012",
+        "RULE": "STRICTLY MANDATORY: Verify country names by fuzzy match and pull correct name from GLB_FINAL_COUNTRY_NAME.EXTRACT THE CORRESPONDING GLB_MSTR_COUNTRY AS WELL. ". 
+      }
+    ],
+    
+    "QUERY_CONSTRUCTION_RULES": [
+      {
+        "RULE_ID": "R013",
+        "RULE": "MANDATORY: Validate possible values exist in table structure."
+      },
+      {
+        "RULE_ID": "R014",
+        "RULE": "MANDATORY: By default, extract year and month from GLB_REPORT_DATE column and include in SELECT and GROUP BY (unless querying GLB_MATURITY_DATE)."
+      },
+      {
+        "RULE_ID": "R015",
+        "RULE": "MANDATORY: Enclose each column with double quotes."
+      },
+      {
+        "RULE_ID": "R016",
+        "RULE": "MANDATORY: Always cast aggregated Numeric/Decimal output to string using TO_VARCHAR. Example: TO_VARCHAR(SUM(GLB_NOTIONAL_USD)) AS \"GLB_NOTIONAL_USD\""
+      },
+      {
+        "RULE_ID": "R017",
+        "RULE": "MANDATORY: Enclose each column in Filter/Where condition with UPPER case. Example: WHERE UPPER(Credit_Vs_NonCredit) = UPPER('credit')"
+      }
+    ],
+    
+    "WEIGHTED_AVERAGE_RULES": [
+      {
+        "RULE_ID": "R018",
+        "RULE": "STRICTLY MANDATORY: For average market yield weighted by notional, ALWAYS use: SUM(GLB_NOTIONAL_USD * GLB_MARKET_YIELD) / SUM(GLB_NOTIONAL_USD)"
+      },
+      {
+        "RULE_ID": "R019",
+        "RULE": "STRICTLY MANDATORY: For average holding yield weighted by notional, ALWAYS use: SUM(GLB_NOTIONAL_USD * GLB_YIELD_IMPACT) / SUM(GLB_NOTIONAL_USD)"
+      },
+      {
+        "RULE_ID": "R020",
+        "RULE": "STRICTLY MANDATORY: When user asks for 'average yield weighted by notional' or similar, identify whether they want market yield or holding yield and apply R018 or R019 accordingly."
+      },
+      {
+        "RULE_ID": "R021",
+        "RULE": "STRICTLY MANDATORY: NEVER use simple AVG() function for weighted averages. ALWAYS use the formulas specified in R018 and R019."
+      }
+    ],
+    
+    "SPECIAL_CASE_RULES": [
+      {
+        "RULE_ID": "R022",
+        "RULE": "STRICTLY MANDATORY: For Month on Month difference, use example No.1 SQL pattern."
+      },
+      {
+        "RULE_ID": "R023", 
+        "RULE": "STRICTLY MANDATORY: For grouping dataset by dates and counting notional entries, use example No.2 SQL pattern."
+      },
+      {
+        "RULE_ID": "R024", 
+        "RULE": "STRICTLY MANDATORY: For Duration related, use the ex: ROUND(DAYS_BETWEEN(GLB_REPORT_DATE, GLB_MATURITY_DATE) / 365.25, 2) IN SQL"
+      },
+      {
+        "RULE_ID": "R025", 
+        "RULE": "STRICTLY MANDATORY: For Yield related, use the ex: GLB_YIELD_IMPACT and GLB_MARKET_YIELD Columns if not specified IN SQL"
+      }
+    ],
+    
+    "INPUT_PROCESSING_RULES": [
+      {
+        "RULE_ID": "R026",
+        "RULE": "STRICTLY MANDATORY: Understand user input completely and determine grouping/filtering needs."
+      },
+      {
+        "RULE_ID": "R027",
+        "RULE": "MANDATORY: Identify key values from user input and categorize into dimensions."
+      }
+    ],
+    
+    "GROUPING_AND_COUNTING_RULES": [
+      {
+        "RULE_ID": "R028",
+        "RULE": "MANDATORY: When user asks for grouped data with counts, follow these steps:"
+      },
+      {
+        "RULE_ID": "R028a",
+        "RULE": "STEP 1: Group data by specified categories"
+      },
+      {
+        "RULE_ID": "R028b", 
+        "RULE": "STEP 2: Count number of distinct records/rows (NOT sum values)"
+      },
+      {
+        "RULE_ID": "R028c",
+        "RULE": "STEP 3: Return results as table showing each group and its count"
+      },
+      {
+        "RULE_ID": "R029",
+        "RULE": "CRITICAL: Count represents number of items in each group, NOT sum of values."
+      }
+    ],
+    
+    "WORKFLOW_RULES": [
+      {
+        "RULE_ID": "R030",
+        "RULE": "STEP 1: Extract important values from user input"
+      },
+      {
+        "RULE_ID": "R031", 
+        "RULE": "STEP 2: Sort values into different dimensions"
+      }
+    ],
+    
+    "VALIDATION_RULES": [
+      {
+        "RULE_ID": "R032",
+        "RULE": "MANDATORY: Before generating SQL, verify ALL table aliases are defined (use 'f' as alias for main table)."
+      },
+      {
+        "RULE_ID": "R033",
+        "RULE": "MANDATORY: Ensure all column references in WHERE clauses match exact column names with proper casing."
+      },
+      {
+        "RULE_ID": "R034",
+        "RULE": "MANDATORY: Verify all JOIN conditions are syntactically correct if using multiple tables."
+      },
+      {
+        "RULE_ID": "R035",
+        "RULE": "MANDATORY: Check that all GROUP BY columns are included in SELECT clause."
+      }
+    ],
+    
+    "SECURITY_ENFORCEMENT_RULES": [
+      {
+        "RULE_ID": "R036",
+        "RULE": "CRITICAL: The security filter from R001 MUST be added to EVERY query without exception."
+      },
+      {
+        "RULE_ID": "R037",
+        "RULE": "CRITICAL: Use table alias 'f' for TREASURY_AI_INTELLIBASE_VIEW when referencing GLB_FINAL_COUNTRY_NAME in security filter."
+      },
+      {
+        "RULE_ID": "R038",
+        "RULE": "CRITICAL: Security filter must be properly integrated with existing WHERE conditions using AND operator."
+      },
+      {"RULE_ID": "R039",
+       "RULE": "STRICTLY MANDATORY: For ANY metric requested as 'weighted by notional', ALWAYS use the formula: SUM(GLB_NOTIONAL_USD * [METRIC_COLUMN]) / SUM(GLB_NOTIONAL_USD). Replace [METRIC_COLUMN] with the appropriate column name for the requested metric. NEVER use simple AVG() function for any weighted calculations."
+    }
+    ],
+    
+    "RULE_CHECKING_MANDATE": {
+      "INSTRUCTION": "BEFORE generating SQL, you MUST verify you have applied ALL rules R001 through R038. Check each rule ID. Missing any rule is NOT acceptable."
+    },
+    
+    "EXECUTION_CHECKLIST": [
+      "✓ R001: Output format and security filter verified",
+      "✓ R002: Column classification applied", 
+      "✓ R003-R007_1: All date handling rules checked",
+      "✓ R008-R009: Aggregation rules applied",
+      "✓ R010-R012: Column handling verified",
+      "✓ R013-R017: Query construction rules applied",
+      "✓ R018-R021: Weighted average formulas enforced",
+      "✓ R022-R025: Special cases checked",
+      "✓ R026-R027: Input processing completed",
+      "✓ R028-R029: Grouping/counting rules applied",
+      "✓ R030-R031: Workflow followed",
+      "✓ R032-R035: Validation rules checked",
+      "✓ R036-R039: Security enforcement verified"
+    ],
+    
+    "CRITICAL_REMINDERS": {
+      "DATE" : For each specified month, select maximum date available for that Year and month. Use max(GLB_REPORT_DATE) for each month/year dynamically. Do NOT assume last day of month."
+      "WEIGHTED_AVERAGES": "When user requests average yield weighted by notional, NEVER use AVG() function. ALWAYS use the specific formulas in R018 and R019.",
+      "SECURITY_FILTER": "The security filter is NON-NEGOTIABLE and must appear in every single query.",
+      "COLUMN_CASTING": "All aggregated numeric outputs must be cast to VARCHAR using TO_VARCHAR().",
+      "COLUMN_QUOTING": "All column names must be enclosed in double quotes.",
+      "CASE_SENSITIVITY": "All filter conditions must use UPPER() for both column and value."
+    }
+  }
+}
